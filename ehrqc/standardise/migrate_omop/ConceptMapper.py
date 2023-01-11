@@ -12,32 +12,39 @@ from sentence_transformers import SentenceTransformer, util
 log = logging.getLogger("Standardise")
 
 
-def fetchMatchingConcept(searchPhrase, standardConcepts, algorithm='semantic'):
+def fetchMatchingConceptFuzzy(searchPhrase, standardConcepts):
+    matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_set_ratio)
+    return matchingConcept[0][0]
 
-    if algorithm == 'fuzzy':
 
-        matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_set_ratio)
+def fetchMatchingConceptSemantic(searchPhrase, standardConcepts):
+    model = SentenceTransformer('pritamdeka/S-BioBert-snli-multinli-stsb')
+    searchPhraseEmbedding = model.encode(searchPhrase, convert_to_tensor=True)
+    matchingConcept = None
+    highestScore = 0
 
-        return matchingConcept[0][0]
+    for standardConcept in standardConcepts:
+        standardConceptEmbedding = model.encode(standardConcept, convert_to_tensor=True)
+        similarityScore = util.pytorch_cos_sim(searchPhraseEmbedding, standardConceptEmbedding)
+        if similarityScore > highestScore:
+            highestScore = similarityScore
+            matchingConcept = standardConcept
 
-    elif algorithm == 'semantic':
+    return matchingConcept
 
-        model = SentenceTransformer('pritamdeka/S-BioBert-snli-multinli-stsb')
-        searchPhraseEmbedding = model.encode(searchPhrase, convert_to_tensor=True)
-        matchingConcept = None
-        highestScore = 0
 
-        for standardConcept in standardConcepts:
-            standardConceptEmbedding = model.encode(standardConcept, convert_to_tensor=True)
-            similarityScore = util.pytorch_cos_sim(searchPhraseEmbedding, standardConceptEmbedding)
-            if similarityScore > highestScore:
-                highestScore = similarityScore
-                matchingConcept = standardConcept
+def fetchMatchingConceptFromReverseIndex(searchPhrase, ix):
+        from whoosh.qparser import QueryParser
+        with ix.searcher() as searcher:
+            query = QueryParser("concept", ix.schema).parse(searchPhrase)
+            results = searcher.search(query)
+            if len(results) > 0:
+                matchingConcept = results[0]['concept']
 
         return matchingConcept
 
-    elif algorithm == 'reverse_index':
 
+def fetchMatchingConceptCreatingReverseIndex(searchPhrase, standardConcepts):
         matchingConcept = None
 
         schema = Schema(concept=TEXT(stored=True))
@@ -111,11 +118,25 @@ def createCustomMapping(
 
     df = None
     for index, row in tqdm(sourceConceptsDf.iterrows(), total = sourceConceptsDf.shape [0]):
-        matchingConcept = fetchMatchingConcept(
-            searchPhrase= re.sub(r'[\$\{\(\[\^\}\]\+\)\/]+', ' ', row[fieldName]) + keyPhrase,
-            standardConcepts = standardConceptsDf['concept_name'],
-            algorithm=algorithm
-            )
+        matchingConcept = None
+        if algorithm == 'fuzzy':
+            matchingConcept = fetchMatchingConceptFuzzy(
+                searchPhrase= re.sub(r'[\$\{\(\[\^\}\]\+\)\/]+', ' ', row[fieldName]) + keyPhrase,
+                standardConcepts = standardConceptsDf['concept_name'],
+                algorithm=algorithm
+                )
+        elif algorithm == 'semantic':
+            matchingConcept = fetchMatchingConceptSemantic(
+                searchPhrase= re.sub(r'[\$\{\(\[\^\}\]\+\)\/]+', ' ', row[fieldName]) + keyPhrase,
+                standardConcepts = standardConceptsDf['concept_name'],
+                algorithm=algorithm
+                )
+        elif algorithm == 'reverse_index':
+            matchingConcept = fetchMatchingConceptCreatingReverseIndex(
+                searchPhrase= re.sub(r'[\$\{\(\[\^\}\]\+\)\/]+', ' ', row[fieldName]) + keyPhrase,
+                standardConcepts = standardConceptsDf['concept_name'],
+                algorithm=algorithm
+                )
         standardRow = standardConceptsDf[standardConceptsDf['concept_name'] == matchingConcept].head(1)
         standardRow['concept_name'] = row[fieldName]
         currentConceptIdQuery = """select max(source_concept_id) from """ + etlSchemaName + """.tmp_custom_mapping where source_concept_id > 2100000000"""
@@ -148,28 +169,32 @@ def createCustomMapping(
     return df
 
 
-def performMajorityVoting(searchPhrase, standardConcepts):
-    semanticConcept = fetchMatchingConcept(searchPhrase=searchPhrase, standardConcepts=standardConcepts, algorithm='semantic')
-    fuzzyConcept = fetchMatchingConcept(searchPhrase=searchPhrase, standardConcepts=standardConcepts, algorithm='fuzzy')
-    reverseIndexConcept = fetchMatchingConcept(searchPhrase=searchPhrase, standardConcepts=standardConcepts, algorithm='reverse_index')
+def performMajorityVoting(searchPhrase, standardConcepts, ix):
+    semanticConcept = fetchMatchingConceptSemantic(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
+    fuzzyConcept = fetchMatchingConceptFuzzy(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
+    reverseIndexConcept = None
+    if ix:
+        reverseIndexConcept = fetchMatchingConceptFromReverseIndex(searchPhrase=searchPhrase, standardConcepts=standardConcepts, ix=ix)
+    else:
+        reverseIndexConcept = fetchMatchingConceptCreatingReverseIndex(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
     if (semanticConcept == fuzzyConcept == reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, 'High')]
+        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'High')]
     elif (semanticConcept == fuzzyConcept != reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, 'Medium'), (searchPhrase, reverseIndexConcept, 'Low')]
+        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
     elif (semanticConcept == reverseIndexConcept != fuzzyConcept):
-        return [(searchPhrase, semanticConcept, 'Medium'), (searchPhrase, fuzzyConcept, 'Low')]
+        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low')]
     elif (reverseIndexConcept == fuzzyConcept != semanticConcept):
-        return [(searchPhrase, reverseIndexConcept, 'Medium'), (searchPhrase, semanticConcept, 'Low')]
+        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Low')]
     elif (semanticConcept != fuzzyConcept != reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, 'Low'), (searchPhrase, fuzzyConcept, 'Low'), (searchPhrase, reverseIndexConcept, 'Low')]
+        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Low'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
 
 
 if __name__ == "__main__":
 
-    # from ehrqc.Utils import getConnection
-    # import pandas as pd
+    from ehrqc.Utils import getConnection
+    import pandas as pd
 
-    # con = getConnection()
+    con = getConnection()
     # df = createCustomMapping(
     #     con
     #     , 'omop_migration_etl_20220817'
@@ -245,13 +270,67 @@ if __name__ == "__main__":
     #     algorithm='reverse_index')
     # print('matchingConcept: ', matchingConcept)
 
-    matchingConcepts = performMajorityVoting(
-        searchPhrase='interesting',
-        standardConcepts=[
-            'This is the first document Even More we\'ve added!',
-            'The second one is even moore Interesting!',
-            'This is the third Even more document we\'ve added!',
-            'The fourth one is even more interesting!',
-            ], 
+    standardConceptsQuery = """
+    select
+    *
+    from
+    omop_migration_etl_20220817.voc_concept
+    where domain_id = 'Observation' and vocabulary_id = 'SNOMED' and concept_class_id = 'Organism'
+    """
+
+    # and vocabulary_id = '' and concept_class_id = ''
+
+    standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
+
+    print(standardConceptsDf)
+    
+    import time
+
+    print('building index: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    schema = Schema(concept=TEXT(stored=True, analyzer=analysis.StemmingAnalyzer()))
+    ix = create_in("temp/indexdir", schema)
+
+    writer = ix.writer()
+    for standardConcept in standardConceptsDf.concept_name:
+        writer.add_document(concept=standardConcept)
+    writer.commit()
+
+    matchingConcepts = []
+
+    print('matching concept 1: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    matchingConcepts1 = performMajorityVoting(
+        searchPhrase='Escherichia coli', standardConcepts=standardConceptsDf.concept_name, ix=ix
         )
-    print(matchingConcepts)
+
+    matchingConcepts.append(matchingConcepts1)
+
+    print('matching concept 2: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    matchingConcepts2 = performMajorityVoting(
+        searchPhrase='salmonella aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
+        )
+
+    matchingConcepts.append(matchingConcepts2)
+
+    print('matching concept 3: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    matchingConcepts3 = performMajorityVoting(
+        searchPhrase='pseudomonas aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
+        )
+
+    matchingConcepts.append(matchingConcepts3)
+
+    print('matching concept 4: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    matchingConcepts4 = performMajorityVoting(
+        searchPhrase='klebsiella pneumoniae', standardConcepts=standardConceptsDf.concept_name, ix=ix
+        )
+
+    matchingConcepts.append(matchingConcepts4)
+
+    for matchingConcept in matchingConcepts:
+        print(matchingConcept)
+
+    print('completed: ', time.strftime("%Y-%m-%d %H:%M"))
