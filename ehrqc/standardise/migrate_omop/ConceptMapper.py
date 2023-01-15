@@ -33,8 +33,26 @@ def fetchMatchingConceptSemantic(searchPhrase, standardConcepts):
     return matchingConcept
 
 
+def fetchMatchingConceptMedcat(searchPhrase, vocab, cdb, mc_status):
+    from medcat.cat import CAT
+
+    cat = CAT(cdb=cdb, config=cdb.config, vocab=vocab, meta_cats=[mc_status])
+
+    entities = cat.get_entities(searchPhrase)['entities']
+    matchingConceptPrettyName = None
+    maxContextSimilarityScore = 0
+    for key in entities.keys():
+        entity = entities[key]
+        contextSimilarityScore = float(entity['context_similarity'])
+        if contextSimilarityScore > maxContextSimilarityScore:
+            matchingConceptPrettyName = entity['pretty_name']
+            maxContextSimilarityScore = contextSimilarityScore
+    return matchingConceptPrettyName
+
+
 def fetchMatchingConceptFromReverseIndex(searchPhrase, ix):
         from whoosh.qparser import QueryParser
+        matchingConcept = None
         with ix.searcher() as searcher:
             query = QueryParser("concept", ix.schema).parse(searchPhrase)
             results = searcher.search(query)
@@ -169,24 +187,25 @@ def createCustomMapping(
     return df
 
 
-def performMajorityVoting(searchPhrase, standardConcepts, ix):
-    semanticConcept = fetchMatchingConceptSemantic(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
+def performMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_status):
+
+    medcatConcept = fetchMatchingConceptMedcat(searchPhrase=searchPhrase, vocab=vocab, cdb=cdb, mc_status=mc_status)
     fuzzyConcept = fetchMatchingConceptFuzzy(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
     reverseIndexConcept = None
     if ix:
-        reverseIndexConcept = fetchMatchingConceptFromReverseIndex(searchPhrase=searchPhrase, standardConcepts=standardConcepts, ix=ix)
+        reverseIndexConcept = fetchMatchingConceptFromReverseIndex(searchPhrase=searchPhrase, ix=ix)
     else:
         reverseIndexConcept = fetchMatchingConceptCreatingReverseIndex(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
-    if (semanticConcept == fuzzyConcept == reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'High')]
-    elif (semanticConcept == fuzzyConcept != reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
-    elif (semanticConcept == reverseIndexConcept != fuzzyConcept):
-        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low')]
-    elif (reverseIndexConcept == fuzzyConcept != semanticConcept):
-        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Medium'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Low')]
-    elif (semanticConcept != fuzzyConcept != reverseIndexConcept):
-        return [(searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, semanticConcept, 'Low'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low'), (searchPhrase, semanticConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
+    if (medcatConcept == fuzzyConcept == reverseIndexConcept):
+        return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'High')]
+    elif (medcatConcept == fuzzyConcept != reverseIndexConcept):
+        return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Medium'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
+    elif (medcatConcept == reverseIndexConcept != fuzzyConcept):
+        return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Medium'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low')]
+    elif (reverseIndexConcept == fuzzyConcept != medcatConcept):
+        return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Medium'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Low')]
+    elif (medcatConcept != fuzzyConcept != reverseIndexConcept):
+        return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
 
 
 if __name__ == "__main__":
@@ -275,18 +294,18 @@ if __name__ == "__main__":
     *
     from
     omop_migration_etl_20220817.voc_concept
-    where domain_id = 'Observation' and vocabulary_id = 'SNOMED' and concept_class_id = 'Organism'
+    where domain_id = 'Procedure' and vocabulary_id = 'SNOMED' and concept_class_id = 'Procedure'
     """
 
-    # and vocabulary_id = '' and concept_class_id = ''
+    # # and vocabulary_id = '' and concept_class_id = ''
 
     standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
 
-    print(standardConceptsDf)
+    # print(standardConceptsDf)
     
-    import time
+    # import time
 
-    print('building index: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('building index: ', time.strftime("%Y-%m-%d %H:%M"))
 
     schema = Schema(concept=TEXT(stored=True, analyzer=analysis.StemmingAnalyzer()))
     ix = create_in("temp/indexdir", schema)
@@ -296,41 +315,93 @@ if __name__ == "__main__":
         writer.add_document(concept=standardConcept)
     writer.commit()
 
-    matchingConcepts = []
+    # matchingConcepts = []
 
-    print('matching concept 1: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('matching concept 1: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    matchingConcepts1 = performMajorityVoting(
-        searchPhrase='Escherichia coli', standardConcepts=standardConceptsDf.concept_name, ix=ix
-        )
+    # matchingConcepts1 = performMajorityVoting(
+    #     searchPhrase='Escherichia coli', standardConcepts=standardConceptsDf.concept_name, ix=ix
+    #     )
 
-    matchingConcepts.append(matchingConcepts1)
+    # matchingConcepts.append(matchingConcepts1)
 
-    print('matching concept 2: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('matching concept 2: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    matchingConcepts2 = performMajorityVoting(
-        searchPhrase='salmonella aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
-        )
+    # matchingConcepts2 = performMajorityVoting(
+    #     searchPhrase='salmonella aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
+    #     )
 
-    matchingConcepts.append(matchingConcepts2)
+    # matchingConcepts.append(matchingConcepts2)
 
-    print('matching concept 3: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('matching concept 3: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    matchingConcepts3 = performMajorityVoting(
-        searchPhrase='pseudomonas aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
-        )
+    # matchingConcepts3 = performMajorityVoting(
+    #     searchPhrase='pseudomonas aeruginosa', standardConcepts=standardConceptsDf.concept_name, ix=ix
+    #     )
 
-    matchingConcepts.append(matchingConcepts3)
+    # matchingConcepts.append(matchingConcepts3)
 
-    print('matching concept 4: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('matching concept 4: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    matchingConcepts4 = performMajorityVoting(
-        searchPhrase='klebsiella pneumoniae', standardConcepts=standardConceptsDf.concept_name, ix=ix
-        )
+    # matchingConcepts4 = performMajorityVoting(
+    #     searchPhrase='klebsiella pneumoniae', standardConcepts=standardConceptsDf.concept_name, ix=ix
+    #     )
 
-    matchingConcepts.append(matchingConcepts4)
+    # matchingConcepts.append(matchingConcepts4)
 
-    for matchingConcept in matchingConcepts:
-        print(matchingConcept)
+    # for matchingConcept in matchingConcepts:
+    #     print(matchingConcept)
 
-    print('completed: ', time.strftime("%Y-%m-%d %H:%M"))
+    # print('completed: ', time.strftime("%Y-%m-%d %H:%M"))
+
+    from medcat.vocab import Vocab
+    from medcat.cdb import CDB
+    from medcat.meta_cat import MetaCAT
+
+    baseDir = '/superbugai-data/yash/temp/'
+    vocabPath = baseDir + 'trained_vocs/shared/vocab.dat'
+    cdbPath = baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
+    mc_statusPath = baseDir + 'trained_vocs/shared/mc_status'
+
+    # Load the vocab model you downloaded
+    vocab = Vocab.load(vocabPath)
+    # Load the cdb model you downloaded
+    cdb = CDB.load(cdbPath)
+    # Download the mc_status model from the models section below and unzip it
+    mc_status = MetaCAT.load(mc_statusPath)
+
+    conceptsDf = pd.read_csv('/superbugai-data/yash/chapter_1/workspace/ETL-UK-Biobank/resources/baseline_field_mapping/20004_operation.csv')
+
+    outRows = []
+
+    for i, row in conceptsDf.iterrows():
+
+        print(row['sourceName'])
+
+        if(pd.isna(row['sourceName'])):
+            continue
+
+        matchingConcepts = performMajorityVoting(
+            searchPhrase=row['sourceName']
+            , standardConcepts=standardConceptsDf.concept_name
+            , ix=ix
+            , vocab=vocab
+            , cdb=cdb
+            , mc_status=mc_status
+            )
+
+        for matchingConcept in matchingConcepts:
+            matchingConceptList = list(matchingConcept)
+            matchingConceptList.append(row['sourceValueCode'])
+            outRows.append(matchingConceptList)
+
+        if (i % 10) == 0:
+            print('i: ', i)
+        # #     break
+
+        # if i == 7:
+        #     break
+
+    matchingConceptsDf = pd.DataFrame(outRows, columns=['searchPhrase', 'medcatConcept', 'fuzzyConcept', 'reverseIndexConcept', 'majorityVoting', 'confidence', 'id'])
+    matchingConceptsDf.to_csv(baseDir + '20004_operation_mapped.csv')
+
