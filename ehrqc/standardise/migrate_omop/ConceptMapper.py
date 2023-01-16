@@ -1,3 +1,5 @@
+import argparse
+
 import logging
 
 from whoosh.index import create_in
@@ -94,7 +96,7 @@ def createCustomMapping(
     , vocabularyId: str
     , conceptClassId: str
     , keyPhrase: str
-    , algorithm='semantic'
+    , algorithm='reverse_index'
     ):
 
     import pandas as pd
@@ -187,7 +189,7 @@ def createCustomMapping(
     return df
 
 
-def performMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_status):
+def fetchMatchingConceptFromMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_status):
 
     medcatConcept = fetchMatchingConceptMedcat(searchPhrase=searchPhrase, vocab=vocab, cdb=cdb, mc_status=mc_status)
     fuzzyConcept = fetchMatchingConceptFuzzy(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
@@ -208,12 +210,125 @@ def performMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_sta
         return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
 
 
-if __name__ == "__main__":
+def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, vocabPath, cdbPath, mc_statusPath, conceptsPath, conceptNameRow, mappedConceptSavePath):
 
     from ehrqc.Utils import getConnection
     import pandas as pd
 
     con = getConnection()
+    standardConceptsQuery = """
+    select
+    *
+    from
+    omop_migration_etl_20220817.voc_concept
+    where
+    domain_id = '""" + domainId + """'
+    and vocabulary_id = '""" + vocabularyId + """'
+    and concept_class_id = '""" + conceptClassId + """'
+    """
+
+    standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
+
+    schema = Schema(concept=TEXT(stored=True, analyzer=analysis.StemmingAnalyzer()))
+    
+    import os
+    
+    if not os.path.isdir("/tmp/indexdir"):
+        os.makedirs("/tmp/indexdir")
+
+    ix = create_in("/tmp/indexdir", schema)
+
+    writer = ix.writer()
+    for standardConcept in standardConceptsDf.concept_name:
+        writer.add_document(concept=standardConcept)
+    writer.commit()
+
+    from medcat.vocab import Vocab
+    from medcat.cdb import CDB
+    from medcat.meta_cat import MetaCAT
+
+    # Load the vocab model you downloaded
+    vocab = Vocab.load(vocabPath)
+    # Load the cdb model you downloaded
+    cdb = CDB.load(cdbPath)
+    # Download the mc_status model from the models section below and unzip it
+    mc_status = MetaCAT.load(mc_statusPath)
+
+    conceptsDf = pd.read_csv(conceptsPath)
+
+    outRows = []
+    
+    from tqdm import tqdm
+
+    for i, row in tqdm(conceptsDf.iterrows(), total=conceptsDf.shape[0]):
+
+        if(pd.isna(row[conceptNameRow])):
+            continue
+
+        matchingConcepts = fetchMatchingConceptFromMajorityVoting(
+            searchPhrase=row[conceptNameRow]
+            , standardConcepts=standardConceptsDf.concept_name
+            , ix=ix
+            , vocab=vocab
+            , cdb=cdb
+            , mc_status=mc_status
+            )
+
+        for matchingConcept in matchingConcepts:
+            matchingConceptList = list(matchingConcept)
+            outRows.append(matchingConceptList)
+
+    matchingConceptsDf = pd.DataFrame(outRows, columns=['searchPhrase', 'medcatConcept', 'fuzzyConcept', 'reverseIndexConcept', 'majorityVoting', 'confidence'])
+    matchingConceptsDf.to_csv(mappedConceptSavePath)
+
+
+if __name__ == "__main__":
+
+    print("Parsing command line arguments")
+
+    parser = argparse.ArgumentParser(description='Perform concept mapping')
+
+    parser.add_argument("domain_id", help="Domain ID of the standard vocabulary to be mapped")
+    parser.add_argument("vocabulary_id", help="Vocabulary ID of the standard vocabulary to be mapped")
+    parser.add_argument("concept_class_id", help="Concept class ID of the standard vocabulary to be mapped")
+    parser.add_argument("vocab_path", help="Path for the Medcat vocab file")
+    parser.add_argument("cdb_path", help="Path for the Medcat cdb file")
+    parser.add_argument("mc_status_path", help="Path for the Medcat mc_status folder")
+    parser.add_argument("concepts_path", help="Path for the concepts csv file")
+    parser.add_argument("concept_name_row", help="Name of the concept name row in the concepts csv file")
+    parser.add_argument("mapped_concepts_save_path", help="Path for saving the mapped concepts csv file")
+
+    args = parser.parse_args()
+
+    generateCustomMappingsForReview(
+        domainId=args.domain_id
+        , vocabularyId=args.vocabulary_id
+        , conceptClassId=args.concept_class_id
+        , vocabPath=args.vocab_path
+        , cdbPath=args.cdb_path
+        , mc_statusPath=args.mc_status_path
+        , conceptsPath=args.concepts_path
+        , conceptNameRow=args.concept_name_row
+        , mappedConceptSavePath=args.mapped_concepts_save_path
+        )
+
+    # baseDir = '/superbugai-data/yash/temp/'
+    # generateCustomMappingsForReview(
+    #     domainId='Procedure'
+    #     , vocabularyId='SNOMED'
+    #     , conceptClassId='Procedure'
+    #     , vocabPath=baseDir + 'trained_vocs/shared/vocab.dat'
+    #     , cdbPath=baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
+    #     , mc_statusPath=baseDir + 'trained_vocs/shared/mc_status'
+    #     , conceptsPath='/tmp/20004_operation.csv'
+    #     , conceptNameRow='sourceName'
+    #     , mappedConceptSavePath='/tmp/20004_operation_mapped.csv'
+    #     )
+
+    # from ehrqc.Utils import getConnection
+    # import pandas as pd
+
+    # con = getConnection()
     # df = createCustomMapping(
     #     con
     #     , 'omop_migration_etl_20220817'
@@ -289,17 +404,17 @@ if __name__ == "__main__":
     #     algorithm='reverse_index')
     # print('matchingConcept: ', matchingConcept)
 
-    standardConceptsQuery = """
-    select
-    *
-    from
-    omop_migration_etl_20220817.voc_concept
-    where domain_id = 'Procedure' and vocabulary_id = 'SNOMED' and concept_class_id = 'Procedure'
-    """
+    # standardConceptsQuery = """
+    # select
+    # *
+    # from
+    # omop_migration_etl_20220817.voc_concept
+    # where domain_id = 'Procedure' and vocabulary_id = 'SNOMED' and concept_class_id = 'Procedure'
+    # """
 
     # # and vocabulary_id = '' and concept_class_id = ''
 
-    standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
+    # standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
 
     # print(standardConceptsDf)
     
@@ -307,13 +422,13 @@ if __name__ == "__main__":
 
     # print('building index: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    schema = Schema(concept=TEXT(stored=True, analyzer=analysis.StemmingAnalyzer()))
-    ix = create_in("temp/indexdir", schema)
+    # schema = Schema(concept=TEXT(stored=True, analyzer=analysis.StemmingAnalyzer()))
+    # ix = create_in("temp/indexdir", schema)
 
-    writer = ix.writer()
-    for standardConcept in standardConceptsDf.concept_name:
-        writer.add_document(concept=standardConcept)
-    writer.commit()
+    # writer = ix.writer()
+    # for standardConcept in standardConceptsDf.concept_name:
+    #     writer.add_document(concept=standardConcept)
+    # writer.commit()
 
     # matchingConcepts = []
 
@@ -354,54 +469,72 @@ if __name__ == "__main__":
 
     # print('completed: ', time.strftime("%Y-%m-%d %H:%M"))
 
-    from medcat.vocab import Vocab
-    from medcat.cdb import CDB
-    from medcat.meta_cat import MetaCAT
+    # from medcat.vocab import Vocab
+    # from medcat.cdb import CDB
+    # from medcat.meta_cat import MetaCAT
 
-    baseDir = '/superbugai-data/yash/temp/'
-    vocabPath = baseDir + 'trained_vocs/shared/vocab.dat'
-    cdbPath = baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
-    mc_statusPath = baseDir + 'trained_vocs/shared/mc_status'
+    # baseDir = '/superbugai-data/yash/temp/'
+    # vocabPath = baseDir + 'trained_vocs/shared/vocab.dat'
+    # cdbPath = baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
+    # mc_statusPath = baseDir + 'trained_vocs/shared/mc_status'
 
-    # Load the vocab model you downloaded
-    vocab = Vocab.load(vocabPath)
-    # Load the cdb model you downloaded
-    cdb = CDB.load(cdbPath)
-    # Download the mc_status model from the models section below and unzip it
-    mc_status = MetaCAT.load(mc_statusPath)
+    # # Load the vocab model you downloaded
+    # vocab = Vocab.load(vocabPath)
+    # # Load the cdb model you downloaded
+    # cdb = CDB.load(cdbPath)
+    # # Download the mc_status model from the models section below and unzip it
+    # mc_status = MetaCAT.load(mc_statusPath)
 
-    conceptsDf = pd.read_csv('/superbugai-data/yash/chapter_1/workspace/ETL-UK-Biobank/resources/baseline_field_mapping/20004_operation.csv')
+    # conceptsDf = pd.read_csv('/superbugai-data/yash/chapter_1/workspace/ETL-UK-Biobank/resources/baseline_field_mapping/20004_operation.csv')
 
-    outRows = []
+    # outRows = []
 
-    for i, row in conceptsDf.iterrows():
+    # for i, row in conceptsDf.iterrows():
 
-        print(row['sourceName'])
+    #     print(row['sourceName'])
 
-        if(pd.isna(row['sourceName'])):
-            continue
+    #     if(pd.isna(row['sourceName'])):
+    #         continue
 
-        matchingConcepts = performMajorityVoting(
-            searchPhrase=row['sourceName']
-            , standardConcepts=standardConceptsDf.concept_name
-            , ix=ix
-            , vocab=vocab
-            , cdb=cdb
-            , mc_status=mc_status
-            )
+        # matchingConcepts = fetchMatchingConceptFromMajorityVoting(
+        #     searchPhrase=row['sourceName']
+        #     , standardConcepts=standardConceptsDf.concept_name
+        #     , ix=ix
+        #     , vocab=vocab
+        #     , cdb=cdb
+        #     , mc_status=mc_status
+        #     )
 
-        for matchingConcept in matchingConcepts:
-            matchingConceptList = list(matchingConcept)
-            matchingConceptList.append(row['sourceValueCode'])
-            outRows.append(matchingConceptList)
+        # for matchingConcept in matchingConcepts:
+        #     matchingConceptList = list(matchingConcept)
+        #     matchingConceptList.append(row['sourceValueCode'])
+        #     outRows.append(matchingConceptList)
 
-        if (i % 10) == 0:
-            print('i: ', i)
+        # if (i % 10) == 0:
+        #     print('i: ', i)
         # #     break
 
         # if i == 7:
         #     break
 
-    matchingConceptsDf = pd.DataFrame(outRows, columns=['searchPhrase', 'medcatConcept', 'fuzzyConcept', 'reverseIndexConcept', 'majorityVoting', 'confidence', 'id'])
-    matchingConceptsDf.to_csv(baseDir + '20004_operation_mapped.csv')
+    # matchingConceptsDf = pd.DataFrame(outRows, columns=['searchPhrase', 'medcatConcept', 'fuzzyConcept', 'reverseIndexConcept', 'majorityVoting', 'confidence', 'id'])
+    # matchingConceptsDf.to_csv(baseDir + '20004_operation_mapped.csv')
 
+
+    # baseDir = '/superbugai-data/yash/temp/'
+    # generateCustomMappingsForReview(
+    #     domainId='Procedure'
+    #     , vocabularyId='SNOMED'
+    #     , conceptClassId='Procedure'
+    #     , vocabPath=baseDir + 'trained_vocs/shared/vocab.dat'
+    #     , cdbPath=baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
+    #     , mc_statusPath=baseDir + 'trained_vocs/shared/mc_status'
+    #     , conceptsPath='/tmp/20004_operation.csv'
+    #     , conceptRow='sourceName'
+    #     , mappedConceptSavePath='/tmp/20004_operation_mapped.csv'
+    #     )
+
+    # domain_id = 'Procedure' and vocabulary_id = 'SNOMED' and concept_class_id = 'Procedure'
+    # vocabPath = baseDir + 'trained_vocs/shared/vocab.dat'
+    # cdbPath = baseDir + 'Athena_SNOMED_Procedure_Procedure_cdb.dat'
+    # mc_statusPath = baseDir + 'trained_vocs/shared/mc_status'

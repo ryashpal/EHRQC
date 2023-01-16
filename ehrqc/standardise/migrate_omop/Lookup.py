@@ -412,7 +412,7 @@ def generateTmpCustomMapping(con, etlSchemaName):
             , vocabularyId = Config.customMapping[conceptType]['standard_attributes']['vocabulary_id']
             , conceptClassId = Config.customMapping[conceptType]['standard_attributes']['concept_class_id']
             , keyPhrase = Config.customMapping[conceptType]['standard_attributes']['key_phrase']
-            , algorithm='semantic'
+            , algorithm='reverse_index'
             )
         dfColumns = ['concept_name', 'source_concept_id', 'source_vocabulary_id', 'source_domain_id', 'source_concept_class_id', 'standard_concept', 'concept_code', 'valid_start_date', 'valid_end_date', 'invalid_reason', 'target_concept_id', 'relationship_id', 'reverese_relationship_id', 'relationship_valid_start_date', 'relationship_end_date', 'invalid_reason_cr']
         __saveDataframe(con=con, destinationSchemaName=etlSchemaName, destinationTableName='tmp_custom_mapping', df=df, dfColumns=dfColumns)

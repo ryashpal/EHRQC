@@ -538,6 +538,54 @@ This function will perform the Extract-Transform-Load (ETL) operations necessary
 
 This function will unload the final tables from the lookup and etl shema to the destination schema called cdm schema.
 
+## Concept Mapping
+
+### To obtain help menu
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper -h
+```
+
+or
+
+ ```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper --help
+```
+
+This will display the following help menu;
+
+```
+usage: ConceptMapper.py [-h]
+                        domain_id vocabulary_id concept_class_id vocab_path cdb_path mc_status_path concepts_path concept_name_row
+                        mapped_concepts_save_path
+
+Perform concept mapping
+
+positional arguments:
+  domain_id             Domain ID of the standard vocabulary to be mapped
+  vocabulary_id         Vocabulary ID of the standard vocabulary to be mapped
+  concept_class_id      Concept class ID of the standard vocabulary to be mapped
+  vocab_path            Path for the Medcat vocab file
+  cdb_path              Path for the Medcat cdb file
+  mc_status_path        Path for the Medcat mc_status folder
+  concepts_path         Path for the concepts csv file
+  concept_name_row      Name of the concept name row in the concepts csv file
+  mapped_concepts_save_path
+                        Path for saving the mapped concepts csv file
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+### Generate custom mappings for review
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper ....
+```
+
+This function will create mappings for the requested concepts and save it as a csv file.
+
+
 ## Acknowledgements
 
 <img src="https://user-images.githubusercontent.com/56529301/155898403-c453ab3f-df17-45c8-ac0a-b314461f5e8f.png" 
