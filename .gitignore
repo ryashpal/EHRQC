@@ -1,6 +1,7 @@
 .venv/*
 notebooks/.venv/*
 notebooks/python/.venv/*
+notebooks/python/concept_mapping/.venv/*
 notebooks/r/.ipynb_checkpoints/*
 notebooks/python/.ipynb_checkpoints/*
 .vscode/*

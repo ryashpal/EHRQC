@@ -15,7 +15,7 @@ log = logging.getLogger("Standardise")
 
 
 def fetchMatchingConceptFuzzy(searchPhrase, standardConcepts):
-    matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_set_ratio)
+    matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_sort_ratio)
     return matchingConcept[0][0]
 
 
@@ -52,6 +52,23 @@ def fetchMatchingConceptMedcat(searchPhrase, vocab, cdb, mc_status):
     return matchingConceptPrettyName
 
 
+def fetchMatchingConceptMedcat(searchPhrase, model_pack_path):
+    from medcat.cat import CAT
+
+    cat = CAT.load_model_pack(model_pack_path)
+
+    entities = cat.get_entities(searchPhrase)['entities']
+    matchingConceptPrettyName = None
+    maxContextSimilarityScore = 0
+    for key in entities.keys():
+        entity = entities[key]
+        contextSimilarityScore = float(entity['context_similarity'])
+        if contextSimilarityScore > maxContextSimilarityScore:
+            matchingConceptPrettyName = entity['pretty_name']
+            maxContextSimilarityScore = contextSimilarityScore
+    return matchingConceptPrettyName
+
+
 def fetchMatchingConceptFromReverseIndex(searchPhrase, ix):
         from whoosh.qparser import QueryParser
         matchingConcept = None
@@ -67,8 +84,13 @@ def fetchMatchingConceptFromReverseIndex(searchPhrase, ix):
 def fetchMatchingConceptCreatingReverseIndex(searchPhrase, standardConcepts):
         matchingConcept = None
 
+        import os
+        
+        if not os.path.isdir("/tmp/indexdir"):
+            os.makedirs("/tmp/indexdir")
+
         schema = Schema(concept=TEXT(stored=True))
-        ix = create_in("temp/indexdir", schema)
+        ix = create_in("/tmp/indexdir", schema)
 
         writer = ix.writer()
         for standardConcept in standardConcepts:
@@ -189,9 +211,13 @@ def createCustomMapping(
     return df
 
 
-def fetchMatchingConceptFromMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_status):
+def fetchMatchingConceptFromMajorityVoting(searchPhrase, standardConcepts, ix, vocab, cdb, mc_status, model_pack_path):
 
-    medcatConcept = fetchMatchingConceptMedcat(searchPhrase=searchPhrase, vocab=vocab, cdb=cdb, mc_status=mc_status)
+    medcatConcept = None
+    if vocab:
+        medcatConcept = fetchMatchingConceptMedcat(searchPhrase=searchPhrase, vocab=vocab, cdb=cdb, mc_status=mc_status)
+    elif model_pack_path:
+        medcatConcept = fetchMatchingConceptMedcat(searchPhrase=searchPhrase, model_pack_path = model_pack_path)
     fuzzyConcept = fetchMatchingConceptFuzzy(searchPhrase=searchPhrase, standardConcepts=standardConcepts)
     reverseIndexConcept = None
     if ix:
@@ -210,7 +236,7 @@ def fetchMatchingConceptFromMajorityVoting(searchPhrase, standardConcepts, ix, v
         return [(searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, medcatConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, fuzzyConcept, 'Low'), (searchPhrase, medcatConcept, fuzzyConcept, reverseIndexConcept, reverseIndexConcept, 'Low')]
 
 
-def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, vocabPath, cdbPath, mc_statusPath, conceptsPath, conceptNameRow, mappedConceptSavePath):
+def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, vocabPath, cdbPath, mc_statusPath, model_pack_path, conceptsPath, conceptNameRow, mappedConceptSavePath):
 
     from ehrqc.Utils import getConnection
     import pandas as pd
@@ -243,16 +269,21 @@ def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, voca
         writer.add_document(concept=standardConcept)
     writer.commit()
 
-    from medcat.vocab import Vocab
-    from medcat.cdb import CDB
-    from medcat.meta_cat import MetaCAT
+    vocab = None
+    cdb = None
+    mc_status = None
 
-    # Load the vocab model you downloaded
-    vocab = Vocab.load(vocabPath)
-    # Load the cdb model you downloaded
-    cdb = CDB.load(cdbPath)
-    # Download the mc_status model from the models section below and unzip it
-    mc_status = MetaCAT.load(mc_statusPath)
+    if vocabPath:
+        from medcat.vocab import Vocab
+        from medcat.cdb import CDB
+        from medcat.meta_cat import MetaCAT
+
+        # Load the vocab model you downloaded
+        vocab = Vocab.load(vocabPath)
+        # Load the cdb model you downloaded
+        cdb = CDB.load(cdbPath)
+        # Download the mc_status model from the models section below and unzip it
+        mc_status = MetaCAT.load(mc_statusPath)
 
     conceptsDf = pd.read_csv(conceptsPath)
 
@@ -272,6 +303,7 @@ def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, voca
             , vocab=vocab
             , cdb=cdb
             , mc_status=mc_status
+            , model_pack_path = model_pack_path
             )
 
         for matchingConcept in matchingConcepts:
@@ -291,12 +323,13 @@ if __name__ == "__main__":
     parser.add_argument("domain_id", help="Domain ID of the standard vocabulary to be mapped")
     parser.add_argument("vocabulary_id", help="Vocabulary ID of the standard vocabulary to be mapped")
     parser.add_argument("concept_class_id", help="Concept class ID of the standard vocabulary to be mapped")
-    parser.add_argument("vocab_path", help="Path for the Medcat vocab file")
-    parser.add_argument("cdb_path", help="Path for the Medcat cdb file")
-    parser.add_argument("mc_status_path", help="Path for the Medcat mc_status folder")
     parser.add_argument("concepts_path", help="Path for the concepts csv file")
     parser.add_argument("concept_name_row", help="Name of the concept name row in the concepts csv file")
     parser.add_argument("mapped_concepts_save_path", help="Path for saving the mapped concepts csv file")
+    parser.add_argument("--vocab_path", help="Path for the Medcat vocab file")
+    parser.add_argument("--cdb_path", help="Path for the Medcat cdb file")
+    parser.add_argument("--mc_status_path", help="Path for the Medcat mc_status folder")
+    parser.add_argument("--model_pack_path", help="Path for the Medcat model_pack_path zip file")
 
     args = parser.parse_args()
 
@@ -307,6 +340,7 @@ if __name__ == "__main__":
         , vocabPath=args.vocab_path
         , cdbPath=args.cdb_path
         , mc_statusPath=args.mc_status_path
+        , model_pack_path=args.model_pack_path
         , conceptsPath=args.concepts_path
         , conceptNameRow=args.concept_name_row
         , mappedConceptSavePath=args.mapped_concepts_save_path

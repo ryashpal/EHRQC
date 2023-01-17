@@ -555,9 +555,8 @@ or
 This will display the following help menu;
 
 ```
-usage: ConceptMapper.py [-h]
-                        domain_id vocabulary_id concept_class_id vocab_path cdb_path mc_status_path concepts_path concept_name_row
-                        mapped_concepts_save_path
+usage: ConceptMapper.py [-h] [--vocab_path VOCAB_PATH] [--cdb_path CDB_PATH] [--mc_status_path MC_STATUS_PATH] [--model_pack_path MODEL_PACK_PATH]
+                        domain_id vocabulary_id concept_class_id concepts_path concept_name_row mapped_concepts_save_path
 
 Perform concept mapping
 
@@ -565,9 +564,6 @@ positional arguments:
   domain_id             Domain ID of the standard vocabulary to be mapped
   vocabulary_id         Vocabulary ID of the standard vocabulary to be mapped
   concept_class_id      Concept class ID of the standard vocabulary to be mapped
-  vocab_path            Path for the Medcat vocab file
-  cdb_path              Path for the Medcat cdb file
-  mc_status_path        Path for the Medcat mc_status folder
   concepts_path         Path for the concepts csv file
   concept_name_row      Name of the concept name row in the concepts csv file
   mapped_concepts_save_path
@@ -575,6 +571,13 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  --vocab_path VOCAB_PATH
+                        Path for the Medcat vocab file
+  --cdb_path CDB_PATH   Path for the Medcat cdb file
+  --mc_status_path MC_STATUS_PATH
+                        Path for the Medcat mc_status folder
+  --model_pack_path MODEL_PACK_PATH
+                        Path for the Medcat model_pack_path zip file
 ```
 
 ### Generate custom mappings for review
