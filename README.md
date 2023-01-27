@@ -91,11 +91,9 @@ patients = {
 }
 ```
 
-# Workflows
+# Workflow
 
-![image](https://user-images.githubusercontent.com/56529301/192424859-0083bda4-b3ae-4647-b666-895e0b1eb272.png)
-
-># **Insert other workflow images here**
+![image](https://user-images.githubusercontent.com/56529301/215007296-9537741c-b78c-46e3-b3d1-cf133c6894d4.png)
 
 # Pre-processing
 
