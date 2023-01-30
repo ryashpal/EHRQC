@@ -340,75 +340,75 @@ def generateCustomMappingsForReview(domainId, vocabularyId, conceptClassId, voca
 
 if __name__ == "__main__":
 
-    # print("Parsing command line arguments")
+    print("Parsing command line arguments")
 
-    # parser = argparse.ArgumentParser(description='Perform concept mapping')
+    parser = argparse.ArgumentParser(description='Perform concept mapping')
 
-    # parser.add_argument("domain_id", help="Domain ID of the standard vocabulary to be mapped")
-    # parser.add_argument("vocabulary_id", help="Vocabulary ID of the standard vocabulary to be mapped")
-    # parser.add_argument("concept_class_id", help="Concept class ID of the standard vocabulary to be mapped")
-    # parser.add_argument("concepts_path", help="Path for the concepts csv file")
-    # parser.add_argument("concept_name_row", help="Name of the concept name row in the concepts csv file")
-    # parser.add_argument("mapped_concepts_save_path", help="Path for saving the mapped concepts csv file")
-    # parser.add_argument("--vocab_path", help="Path for the Medcat vocab file")
-    # parser.add_argument("--cdb_path", help="Path for the Medcat cdb file")
-    # parser.add_argument("--mc_status_path", help="Path for the Medcat mc_status folder")
-    # parser.add_argument("--model_pack_path", help="Path for the Medcat model_pack_path zip file")
+    parser.add_argument("domain_id", help="Domain ID of the standard vocabulary to be mapped")
+    parser.add_argument("vocabulary_id", help="Vocabulary ID of the standard vocabulary to be mapped")
+    parser.add_argument("concept_class_id", help="Concept class ID of the standard vocabulary to be mapped")
+    parser.add_argument("concepts_path", help="Path for the concepts csv file")
+    parser.add_argument("concept_name_row", help="Name of the concept name row in the concepts csv file")
+    parser.add_argument("mapped_concepts_save_path", help="Path for saving the mapped concepts csv file")
+    parser.add_argument("--vocab_path", help="Path for the Medcat vocab file")
+    parser.add_argument("--cdb_path", help="Path for the Medcat cdb file")
+    parser.add_argument("--mc_status_path", help="Path for the Medcat mc_status folder")
+    parser.add_argument("--model_pack_path", help="Path for the Medcat model_pack_path zip file")
 
-    # args = parser.parse_args()
+    args = parser.parse_args()
 
-    # generateCustomMappingsForReview(
-    #     domainId=args.domain_id
-    #     , vocabularyId=args.vocabulary_id
-    #     , conceptClassId=args.concept_class_id
-    #     , vocabPath=args.vocab_path
-    #     , cdbPath=args.cdb_path
-    #     , mc_statusPath=args.mc_status_path
-    #     , model_pack_path=args.model_pack_path
-    #     , conceptsPath=args.concepts_path
-    #     , conceptNameRow=args.concept_name_row
-    #     , mappedConceptSavePath=args.mapped_concepts_save_path
-    #     )
-
-
-    def fetchMatchingConceptFuzzy(i, searchPhrase, sourceValueCode, standardConcepts):
-        if (i%100 == 0):
-            print('i: ', i)
-        matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_sort_ratio)
-        return searchPhrase, sourceValueCode, matchingConcept[0][0]
-
-    from ehrqc.Utils import getConnection
-    import pandas as pd
-
-    con = getConnection()
-    standardConceptsQuery = """
-    select
-    *
-    from
-    omop_migration_etl_20220817.voc_concept
-    where domain_id = 'Drug' and vocabulary_id = 'RxNorm Extension'
-    """
-
-    standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
-
-    conceptsDf = pd.read_csv('/superbugai-data/yash/chapter_1/workspace/ETL-UK-Biobank/resources/baseline_field_mapping/20003_treatment_medication.csv')
-
-    from multiprocessing import Pool
-    matchingOutputFuzzy = []
-    with Pool() as p:
-        matchingOutputFuzzy = p.starmap(
-            fetchMatchingConceptFuzzy
-            , zip(
-                list(range(conceptsDf.shape[0]))
-                , conceptsDf.sourceName
-                , conceptsDf.sourceValueCode
-                , [standardConceptsDf.concept_name]*conceptsDf.shape[0]
-                )
+    generateCustomMappingsForReview(
+        domainId=args.domain_id
+        , vocabularyId=args.vocabulary_id
+        , conceptClassId=args.concept_class_id
+        , vocabPath=args.vocab_path
+        , cdbPath=args.cdb_path
+        , mc_statusPath=args.mc_status_path
+        , model_pack_path=args.model_pack_path
+        , conceptsPath=args.concepts_path
+        , conceptNameRow=args.concept_name_row
+        , mappedConceptSavePath=args.mapped_concepts_save_path
         )
 
-    matchingOutputFuzzyDf = pd.DataFrame(matchingOutputFuzzy, columns=['searchPhrase', 'sourceValueCode', 'fuzzyConcept'])
 
-    matchingOutputFuzzyDf.to_csv('/tmp/20003_treatment_medication_fuzzy_mapped.csv', index=False)
+    # def fetchMatchingConceptFuzzy(i, searchPhrase, sourceValueCode, standardConcepts):
+    #     if (i%100 == 0):
+    #         print('i: ', i)
+    #     matchingConcept = process.extract(searchPhrase, standardConcepts, limit=1, scorer=fuzz.token_sort_ratio)
+    #     return searchPhrase, sourceValueCode, matchingConcept[0][0]
+
+    # from ehrqc.Utils import getConnection
+    # import pandas as pd
+
+    # con = getConnection()
+    # standardConceptsQuery = """
+    # select
+    # *
+    # from
+    # omop_migration_etl_20220817.voc_concept
+    # where domain_id = 'Drug' and vocabulary_id = 'RxNorm Extension'
+    # """
+
+    # standardConceptsDf = pd.read_sql_query(standardConceptsQuery, con)
+
+    # conceptsDf = pd.read_csv('/superbugai-data/yash/chapter_1/workspace/ETL-UK-Biobank/resources/baseline_field_mapping/20003_treatment_medication.csv')
+
+    # from multiprocessing import Pool
+    # matchingOutputFuzzy = []
+    # with Pool() as p:
+    #     matchingOutputFuzzy = p.starmap(
+    #         fetchMatchingConceptFuzzy
+    #         , zip(
+    #             list(range(conceptsDf.shape[0]))
+    #             , conceptsDf.sourceName
+    #             , conceptsDf.sourceValueCode
+    #             , [standardConceptsDf.concept_name]*conceptsDf.shape[0]
+    #             )
+    #     )
+
+    # matchingOutputFuzzyDf = pd.DataFrame(matchingOutputFuzzy, columns=['searchPhrase', 'sourceValueCode', 'fuzzyConcept'])
+
+    # matchingOutputFuzzyDf.to_csv('/tmp/20003_treatment_medication_fuzzy_mapped.csv', index=False)
 
     # from ehrqc.Utils import getConnection
     # import pandas as pd
