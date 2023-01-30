@@ -7,35 +7,40 @@ from ehrqc.qc.vitalsOutliers import plot as plotVitalsOutliers
 from ehrqc.qc.labMeasurementsOutliers import plot as plotLabMeasurementsOutliers
 
 
-def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.html'):
+def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.html', column_mapping = {}):
 
     dataDf = pd.read_csv(sourcePath)
     if (dataDf is not None):
         log.info('generating graphs')
         if (plotType == 'demographics_explore'):
             plotDemographicsGraphs(
-                df=dataDf[['age', 'weight', 'height', 'gender', 'ethnicity', 'dob', 'dod']]
+                df=dataDf
                 , outputFile = savePath
+                , column_mapping = column_mapping
                 )
         elif (plotType == 'vitals_explore'):
             plotVitalsGraphs(
                 df = dataDf
                 , outputFile = savePath
+                , column_mapping = column_mapping
                 )
         elif (plotType == 'lab_measurements_explore'):
             plotLabMeasurementsGraphs(
                 df = dataDf
                 , outputFile = savePath
+                , column_mapping = column_mapping
                 )
         elif (plotType == 'vitals_outliers'):
             plotVitalsOutliers(
                 df = dataDf
                 , outputFile = savePath
+                , column_mapping = column_mapping
                 )
         elif (plotType == 'lab_measurements_outliers'):
             plotLabMeasurementsOutliers(
                 df = dataDf
                 , outputFile = savePath
+                , column_mapping = column_mapping
                 )
 
 
@@ -44,6 +49,7 @@ if __name__ == '__main__':
     import logging
     import sys
     import argparse
+    import json
 
     log = logging.getLogger("EHRQC")
     log.setLevel(logging.INFO)
@@ -66,12 +72,22 @@ if __name__ == '__main__':
     parser.add_argument('save_path', nargs=1, default='plot.html',
                         help='Path of the file to store the output')
 
+    parser.add_argument('-c', '--column_mapping', type=str)
+
     args = parser.parse_args()
 
     log.info('args.plot_type: ' + str(args.plot_type[0]))
     log.info('args.source_path: ' + str(args.source_path[0]))
     log.info('args.save_path: ' + str(args.save_path[0]))
 
-    run(plotType=args.plot_type[0], sourcePath = args.source_path[0], savePath = args.save_path[0])
+    column_mapping_raw = args.column_mapping
+    if column_mapping_raw:
+        column_mapping = json.loads(column_mapping_raw)
+    else:
+        column_mapping = {}
+
+    log.info('args.column_mapping: ' + str(column_mapping))
+
+    run(plotType=args.plot_type[0], sourcePath = args.source_path[0], savePath = args.save_path[0], column_mapping=column_mapping)
 
     log.info('Done!!')

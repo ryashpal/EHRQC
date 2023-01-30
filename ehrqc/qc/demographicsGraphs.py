@@ -16,7 +16,20 @@ def plot(
     weightCol = 'weight', 
     heightCol = 'height', 
     genderCol = 'gender', 
-    ethnicityCol = 'ethnicity'):
+    ethnicityCol = 'ethnicity',
+    column_mapping = {}
+    ):
+
+    if 'age' in column_mapping:
+        ageCol = column_mapping['age']
+    elif 'weight' in column_mapping:
+        weightCol = column_mapping['weight']
+    elif 'height' in column_mapping:
+        heightCol = column_mapping['height']
+    elif 'gender' in column_mapping:
+        genderCol = column_mapping['gender']
+    elif 'ethnicity' in column_mapping:
+        ethnicityCol = column_mapping['ethnicity']
 
     doc.asis('<!DOCTYPE html>')
     with tag('html'):
