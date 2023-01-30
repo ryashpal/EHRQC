@@ -99,9 +99,10 @@ patients = {
 
 ## Extract
 
-><span style="color:red">`Note 1: The extract module is required if the EHR data exists in a relational database.`</span>
 
-> :warning: `Note 2: If the EHR data is in the flat file (.csv), please proceed to next sections`
+> :warning: **`Note 1: The extract module is required if the EHR data exists in a relational database`**
+
+> :warning: **`Note 2: If the EHR data is in the flat file (.csv), please proceed to next sections`**
 
 ### To obtain help menu
 
