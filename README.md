@@ -99,6 +99,10 @@ patients = {
 
 ## Extract
 
+>`Note 1: The extract module is required if the EHR data exists in a relational database`
+
+>`Note 2: If the EHR data is in the flat file (.csv), please proceed to next sections`
+
 ### To obtain help menu
 
 ```shell
