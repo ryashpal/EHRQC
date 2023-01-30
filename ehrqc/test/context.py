@@ -4,6 +4,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import qc.demographicsGraphs as demographicsGraphs
 import qc.vitalsGraphs as vitalsGraphs
-import qc.vitalsAnomalies as vitalsAnomalies
+import ehrqc.qc.vitalsOutliers as vitalsOutliers
 import qc.labMeasurementsGraphs as labMeasurementsGraphs
-import ehrqc.qc.Anomaly as Anomaly
+import ehrqc.qc.Outliers as Outliers

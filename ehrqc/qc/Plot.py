@@ -3,8 +3,8 @@ import pandas as pd
 from ehrqc.qc.demographicsGraphs import plot as plotDemographicsGraphs
 from ehrqc.qc.vitalsGraphs import plot as plotVitalsGraphs
 from ehrqc.qc.labMeasurementsGraphs import plot as plotLabMeasurementsGraphs
-from ehrqc.qc.vitalsAnomalies import plot as plotVitalsAnomalies
-from ehrqc.qc.labMeasurementsAnomalies import plot as plotLabMeasurementsAnomalies
+from ehrqc.qc.vitalsOutliers import plot as plotVitalsOutliers
+from ehrqc.qc.labMeasurementsOutliers import plot as plotLabMeasurementsOutliers
 
 
 def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.html'):
@@ -27,13 +27,13 @@ def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.htm
                 df = dataDf
                 , outputFile = savePath
                 )
-        elif (plotType == 'vitals_anomalies'):
-            plotVitalsAnomalies(
+        elif (plotType == 'vitals_outliers'):
+            plotVitalsOutliers(
                 df = dataDf
                 , outputFile = savePath
                 )
-        elif (plotType == 'lab_measurements_anomalies'):
-            plotLabMeasurementsAnomalies(
+        elif (plotType == 'lab_measurements_outliers'):
+            plotLabMeasurementsOutliers(
                 df = dataDf
                 , outputFile = savePath
                 )
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='EHRQC')
 
     parser.add_argument('plot_type', nargs=1, default='demographics',
-                        help='Type of plot to generate [demographics_explore, vitals_explore, lab_measurements_explore, vitals_anomalies, lab_measurements_anomalies]')
+                        help='Type of plot to generate [demographics_explore, vitals_explore, lab_measurements_explore, vitals_outliers, lab_measurements_outliers]')
 
     parser.add_argument('source_path', nargs=1, default='data.csv',
                         help='Source data path')

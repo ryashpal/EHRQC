@@ -224,29 +224,29 @@ This will generate QC plots from the lab measurements data obtained from the `so
 
 [Lab measurements Plots](https://ryashpal.github.io/EHRQC/lab_measurements.html)
 
-### To plot anomaly graphs for vitals
+### To plot outliers graphs for vitals
 
 ```shell
-.venv/bin/python -m ehrqc.qc.Plot vitals_anomalies temp/mimic_vitals_imputed.csv temp/mimic_vitals_anomalies.html
+.venv/bin/python -m ehrqc.qc.Plot vitals_outliers temp/mimic_vitals_imputed.csv temp/mimic_vitals_outliers.html
 ```
 
 This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`.
 
 #### Example Output
 
-[Vitals anomaly Plots](https://ryashpal.github.io/EHRQC/vitals_anomalies.html)
+[Vitals outliers Plots](https://ryashpal.github.io/EHRQC/vitals_outliers.html)
 
-### To plot anomaly graphs for lab measurements
+### To plot outliers graphs for lab measurements
 
 ```shell
-.venv/bin/python -m ehrqc.qc.Plot lab_measurements_anomalies temp/mimic_lab_measurements_imputed.csv temp/mimic_lab_measurements_anomalies.html
+.venv/bin/python -m ehrqc.qc.Plot lab_measurements_outliers temp/mimic_lab_measurements_imputed.csv temp/mimic_lab_measurements_outliers.html
 ```
 
 This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`.
 
 #### Example Output
 
-[Lab measurements anomaly Plots](https://ryashpal.github.io/EHRQC/lab_measurements_anomalies.html)
+[Lab measurements outliers Plots](https://ryashpal.github.io/EHRQC/lab_measurements_outliers.html)
 
 ## Impute
 

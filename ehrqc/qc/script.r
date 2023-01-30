@@ -1,7 +1,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 ## same function as above
-detect_anomalies <- function(path.to.input, path.to.output) {
+detect_outliers <- function(path.to.input, path.to.output) {
 
     data.in <- read.csv(path.to.input)
     y1 <- DDoutlier::KNN_AGG(data.in)
@@ -20,4 +20,4 @@ detect_anomalies <- function(path.to.input, path.to.output) {
 
 }
 
-detect_anomalies(path.to.input = args[1], path.to.output = args[2])
+detect_outliers(path.to.input = args[1], path.to.output = args[2])
