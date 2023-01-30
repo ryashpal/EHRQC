@@ -174,32 +174,28 @@ This will extract the lab measurements data from mimic schema and store it in th
 ### To obtain help menu
 
 ```shell
-.venv/bin/python -m ehrqc.qc.Plot -h
-```
-
-This will display the following help menu;
-
-```
-usage: Plot.py [-h] plot_type source_path save_path
+usage: Plot.py [-h] [-c COLUMN_MAPPING] plot_type source_path save_path
 
 EHRQC
 
 positional arguments:
-  plot_type    Type of plot to generate [demographics, vitals, lab_measurements]
-  source_path  Source data path
-  save_path    Path of the file to store the output
+  plot_type             Type of plot to generate [demographics_explore, vitals_explore, lab_measurements_explore, vitals_outliers,
+                        lab_measurements_outliers]
+  source_path           Source data path
+  save_path             Path of the file to store the output
 
 optional arguments:
-  -h, --help   show this help message and exit
+  -h, --help            show this help message and exit
+  -c COLUMN_MAPPING, --column_mapping COLUMN_MAPPING
 ```
 
 ### To plot exploration graphs for demographics
 
 ```shell
-.venv/bin/python -m ehrqc.qc.Plot demographics_explore temp/mimic_demographics.csv temp/mimic_demographics_explore.html
+.venv/bin/python -m ehrqc.qc.Plot demographics_explore temp/mimic_demographics.csv temp/mimic_demographics_explore.html -c {}
 ```
 
-This will generate QC plots from the demograhic data obtained from the `source_path` and save it in the `save_path`.
+This will generate QC plots from the demograhic data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
 #### Example Output
 
@@ -211,7 +207,7 @@ This will generate QC plots from the demograhic data obtained from the `source_p
 .venv/bin/python -m ehrqc.qc.Plot vitals_explore temp/mimic_vitals.csv temp/mimic_vitals_explore.html
 ```
 
-This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`.
+This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
 #### Example Output
 
@@ -223,7 +219,7 @@ This will generate QC plots from the vitals data obtained from the `source_path`
 .venv/bin/python -m ehrqc.qc.Plot lab_measurements_explore temp/mimic_lab_measurements.csv temp/mimic_lab_measurements_explore.html
 ```
 
-This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`.
+This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
 #### Example Output
 
@@ -235,7 +231,7 @@ This will generate QC plots from the lab measurements data obtained from the `so
 .venv/bin/python -m ehrqc.qc.Plot vitals_outliers temp/mimic_vitals_imputed.csv temp/mimic_vitals_outliers.html
 ```
 
-This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`.
+This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
 #### Example Output
 
@@ -247,7 +243,7 @@ This will generate QC plots from the vitals data obtained from the `source_path`
 .venv/bin/python -m ehrqc.qc.Plot lab_measurements_outliers temp/mimic_lab_measurements_imputed.csv temp/mimic_lab_measurements_outliers.html
 ```
 
-This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`.
+This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
 #### Example Output
 
