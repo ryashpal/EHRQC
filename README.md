@@ -1,6 +1,6 @@
 # **EHRQC**
 
-# Installation
+## Installation
 
 ### Clone the repository from GitHub.
 
@@ -21,7 +21,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-# Configuration
+## Configuration
 
 The database connection details needs to be updated in the configuration file before using the utility;
 
@@ -91,11 +91,11 @@ patients = {
 }
 ```
 
-# Workflow
+## Workflow
 
 ![image](https://user-images.githubusercontent.com/56529301/215373211-c7a311f8-e8ed-4740-a565-1bedfe512ec8.png)
 
-# Pre-processing
+## Pre-processing
 
 ## Extract
 
@@ -189,6 +189,24 @@ optional arguments:
   -c COLUMN_MAPPING, --column_mapping COLUMN_MAPPING
 ```
 
+The column mapping has to be in json format as shown below;
+
+```
+'{"expected_column_name": "custom_column_name"}'
+```
+
+For instance, if the "Age" attribute in demographics csv file is under the column name "Number of Years" instead of default "age" column name, then the following mapping can be applied;
+
+```
+'{"age": "Number of Years"}'
+```
+
+Similarly, more than one columns can be mapped in this manner;
+
+```
+'{"age": "Number of Years", "gender": "Sex"}'
+```
+
 ### To plot exploration graphs for demographics
 
 ```shell
@@ -196,6 +214,16 @@ optional arguments:
 ```
 
 This will generate QC plots from the demograhic data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
+
+This utility expects the file to contain the information under the following columns;
+
+| Expected Column Name | Column Details |
+|-----------|-------------|
+| age | Age of the person |
+| weight | Weight of the person |
+| height | Height of the person |
+| gender | Gender of the person |
+| ethnicity | Ethnicity of the person |
 
 #### Example Output
 
@@ -209,6 +237,21 @@ This will generate QC plots from the demograhic data obtained from the `source_p
 
 This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
+This utility expects the file to contain the information under the following columns;
+
+| Expected Column Name | Column Details |
+|-----------|-------------|
+| heartrate | Heart Rate |
+| sysbp | Systolic Blood Pressure |
+| diabp | Diastolic Blood Pressure |
+| meanbp | Mean Blood Pressure |
+| resprate | Respiratory Rate |
+| tempc | Temperature |
+| spo2 | Oxygen Saturation |
+| gcseye | Glasgow Coma Scale - Eye Response |
+| gcsverbal | Glasgow Coma Scale - Verbal Response |
+| gcsmotor | Glasgow Coma Scale - Motor Response |
+
 #### Example Output
 
 [Vitals Plots](https://ryashpal.github.io/EHRQC/vitals.html)
@@ -220,6 +263,31 @@ This will generate QC plots from the vitals data obtained from the `source_path`
 ```
 
 This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
+
+This utility expects the file to contain the information under the following columns;
+
+| Expected Column Name | Column Details |
+|-----------|-------------|
+| glucose | Glucose |
+| hemoglobin | Hemoglobin |
+| anion_gap | Anion Gap |
+| bicarbonate | Bicarbonate |
+| calcium_total | Calcium Total |
+| chloride | Chloride |
+| creatinine | Creatinine |
+| magnesium | Magnesium |
+| phosphate | Phosphate |
+| potassium | Potassium |
+| sodium | Sodium |
+| urea_nitrogen | Urea Nitrogen |
+| hematocrit | Hematocrit |
+| mch | Mean Cell Hemoglobin |
+| mchc | Mean Corpuscular Hemoglobin Concentration |
+| mcv | Mean Corpuscular Volume |
+| platelet_count | Platelet Count |
+| rdw | Red cell Distribution Width |
+| red_blood_cells | Red Blood Cells |
+| white_blood_cells | White Blood Cells |
 
 #### Example Output
 
@@ -233,6 +301,23 @@ This will generate QC plots from the lab measurements data obtained from the `so
 
 This will generate QC plots from the vitals data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
 
+This utility expects the file to contain the information under the following columns;
+
+
+| Expected Column Name | Column Details |
+|-----------|-------------|
+| heartrate | Heart Rate |
+| sysbp | Systolic Blood Pressure |
+| diabp | Diastolic Blood Pressure |
+| meanbp | Mean Blood Pressure |
+| resprate | Respiratory Rate |
+| tempc | Temperature |
+| spo2 | Oxygen Saturation |
+| gcseye | Glasgow Coma Scale - Eye Response |
+| gcsverbal | Glasgow Coma Scale - Verbal Response |
+| gcsmotor | Glasgow Coma Scale - Motor Response |
+
+
 #### Example Output
 
 [Vitals outliers Plots](https://ryashpal.github.io/EHRQC/vitals_outliers.html)
@@ -244,6 +329,31 @@ This will generate QC plots from the vitals data obtained from the `source_path`
 ```
 
 This will generate QC plots from the lab measurements data obtained from the `source_path` and save it in the `save_path`. If the source csv file is not in a standard format, then a `column_mapping` needs to be provided.
+
+This utility expects the file to contain the information under the following columns;
+
+| Expected Column Name | Column Details |
+|-----------|-------------|
+| glucose | Glucose |
+| hemoglobin | Hemoglobin |
+| anion_gap | Anion Gap |
+| bicarbonate | Bicarbonate |
+| calcium_total | Calcium Total |
+| chloride | Chloride |
+| creatinine | Creatinine |
+| magnesium | Magnesium |
+| phosphate | Phosphate |
+| potassium | Potassium |
+| sodium | Sodium |
+| urea_nitrogen | Urea Nitrogen |
+| hematocrit | Hematocrit |
+| mch | Mean Cell Hemoglobin |
+| mchc | Mean Corpuscular Hemoglobin Concentration |
+| mcv | Mean Corpuscular Volume |
+| platelet_count | Platelet Count |
+| rdw | Red cell Distribution Width |
+| red_blood_cells | Red Blood Cells |
+| white_blood_cells | White Blood Cells |
 
 #### Example Output
 
