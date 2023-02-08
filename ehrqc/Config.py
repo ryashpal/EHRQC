@@ -9,13 +9,13 @@ db_details = {
 
 # new schema to host the migrated tables
 
-lookup_schema_name = 'vocabulary_test_20221013'
+lookup_schema_name = 'vocabulary_test_20220207'
 
-source_schema_name = 'omop_migration_source_20221013'
+source_schema_name = 'omop_migration_source_20220207'
 
-etl_schema_name = 'omop_migration_etl_20221013'
+etl_schema_name = 'omop_migration_etl_20220207'
 
-cdm_schema_name = 'omop_test_20221013'
+cdm_schema_name = 'omop_test_20220207'
 
 # Vocabulary files path
 

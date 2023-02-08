@@ -1,5 +1,14 @@
 # **EHRQC**
 
+EHR-QC is a complete end-to-end pipeline to standardise and preprocess Electronic Health Records (EHR) for downstream integrative machine learning applications. This utility has two distinct modules;
+
+1. Standardisation
+2. Pre-processing
+
+Both the modules can be run as a single end-to-end pipeline or individual components can be run in a standalone manner.
+
+This utility is primarily focussed to provide a domain specific toolset for performing commmon standardisation and pre-processing tasks while handling the healthcare data. A command line interface is designed to provide an abstraction over the internal implementation details while at the same time being easy to use for anyone with basic Linux skills.
+
 ## Installation
 
 ### Clone the repository from GitHub.
@@ -75,8 +84,6 @@ vocabulary = {
 
 *CSV file paths containing EHR data and the column mappings*
 
-Ex:
-
 ```bash
 patients = {
 
@@ -91,9 +98,170 @@ patients = {
 }
 ```
 
+For example, the mapping information for entity `Patients` will be as shown below;
+
+```bash
+patients = {
+    'file_name': '/path/to/patients.csv',
+    'column_mapping': {
+        'subject_id': "<Subject ID column name in the csv file>",
+        'gender': "<Gender column name in the csv file>",
+        'anchor_age': "<Age column name in the csv file>",
+        'anchor_year': "<Year column name in the csv file>",
+        'dod': "<DOD column name in the csv file>"
+    },
+}
+```
+
+# **Add all the other entitiy columns here**
+
 ## Workflow
 
 ![image](https://user-images.githubusercontent.com/56529301/215373211-c7a311f8-e8ed-4740-a565-1bedfe512ec8.png)
+
+
+# Standardisation
+
+## OMOP-CDM migration
+
+### To obtain help menu
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -h
+```
+
+or
+
+ ```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run --help
+```
+
+This will display the following help menu;
+
+```
+usage: Run.py [-h] [-l] [-f] [-s] [-m] [-c] [-e] [-u]
+
+Migrate EHR to OMOP-CDM
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l, --create_lookup   Create lookup by importing Athena vocabulary and custom mapping
+  -f, --import_file     Import EHR from a csv files
+  -s, --stage           Stage the data on the ETL schema
+  -m, --generate_mapping
+                        Generate custom mapping of concepts from the data
+  -c, --import_custom_mapping
+                        Import custom mapping file
+  -e, --perform_etl     Perform migration Extract-Transform-Load (ETL) operations
+  -u, --unload          Unload data to CDM schema
+```
+
+### Create lookup by importing Athena vocabulary and custom mapping
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -l
+```
+
+This function will import Athena vocabulary files from the path specified in the configuration files (`vocabulary` attribute) in to the lookup schema specified by `lookup_schema_name`.
+
+### Import EHR from a csv files
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -f
+```
+
+This function will import EHR data from csv files from the path specified in the configuration files (under every entity) in to the source schema specified by `source_schema_name`.
+
+### Stage the data on the ETL schema
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -s
+```
+
+This function will stage the data from source schema into the etl schema specified by `etl_schema_name` attrbibute in the configuration file.
+
+### Generate custom mapping of concepts from the data
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -m
+```
+
+This function will automatically generate mappings for the specified vocabularies in the configuration file under `customMapping` attribute and update the vocabulary in the database with mapped automatically concepts.
+
+### Import custom mapping file
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -c
+```
+
+This function will import manually generated custom mappings from the csv file specified under `vocabulary>tmp_custom_mapping` attribute in the configuration file and update the vocabulary in the database with manually mapped concepts.
+
+### Perform migration Extract-Transform-Load (ETL) operations
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -e
+```
+
+This function will perform the Extract-Transform-Load (ETL) operations necessary to format the source data as per the OMOP-CDM schema and stores the final tables in etl schema.
+
+### Unload data to CDM schema
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -u
+```
+
+This function will unload the final tables from the lookup and etl shema to the destination schema called cdm schema.
+
+## Concept Mapping
+
+### To obtain help menu
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper -h
+```
+
+or
+
+ ```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper --help
+```
+
+This will display the following help menu;
+
+```
+usage: ConceptMapper.py [-h] [--vocab_path VOCAB_PATH] [--cdb_path CDB_PATH] [--mc_status_path MC_STATUS_PATH] [--model_pack_path MODEL_PACK_PATH]
+                        domain_id vocabulary_id concept_class_id concepts_path concept_name_row mapped_concepts_save_path
+
+Perform concept mapping
+
+positional arguments:
+  domain_id             Domain ID of the standard vocabulary to be mapped
+  vocabulary_id         Vocabulary ID of the standard vocabulary to be mapped
+  concept_class_id      Concept class ID of the standard vocabulary to be mapped
+  concepts_path         Path for the concepts csv file
+  concept_name_row      Name of the concept name row in the concepts csv file
+  mapped_concepts_save_path
+                        Path for saving the mapped concepts csv file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --vocab_path VOCAB_PATH
+                        Path for the Medcat vocab file
+  --cdb_path CDB_PATH   Path for the Medcat cdb file
+  --mc_status_path MC_STATUS_PATH
+                        Path for the Medcat mc_status folder
+  --model_pack_path MODEL_PACK_PATH
+                        Path for the Medcat model_pack_path zip file
+```
+
+### Generate custom mappings for review
+
+```shell
+.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper ....
+```
+
+This function will create mappings for the requested concepts and save it as a csv file.
+
 
 ## Pre-processing
 
@@ -409,7 +577,8 @@ This will impute missing values in the data obtained from the `source_path` usin
 - expectation maximisation
 - multiple imputation
 
-## ETL Pipeline
+
+## Pre-processing Pipeline
 
 ### To obtain help menu
 
@@ -553,149 +722,6 @@ This will create a csv file containing the raw data with the name `mimic_lab_mea
 .venv/bin/python -m ehrqc.qc.Pipeline temp omop lab_measurements omop_cdm -d -i
 ```
 This will create a csv file containing the raw data with the name `omop_lab_measurements_raw_data.csv`, a csv file containing the imputed data with the name `omop_lab_measurements_imputed_data.csv`, and a html file containing the generated graphs with the name `omop_lab_measurements_plots.html` in the `save_path`.
-
-
-# Standardise
-
-## OMOP-CDM migration
-
-### To obtain help menu
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -h
-```
-
-or
-
- ```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run --help
-```
-
-This will display the following help menu;
-
-```
-usage: Run.py [-h] [-l] [-f] [-s] [-m] [-c] [-e] [-u]
-
-Migrate EHR to OMOP-CDM
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -l, --create_lookup   Create lookup by importing Athena vocabulary and custom mapping
-  -f, --import_file     Import EHR from a csv files
-  -s, --stage           Stage the data on the ETL schema
-  -m, --generate_mapping
-                        Generate custom mapping of concepts from the data
-  -c, --import_custom_mapping
-                        Import custom mapping file
-  -e, --perform_etl     Perform migration Extract-Transform-Load (ETL) operations
-  -u, --unload          Unload data to CDM schema
-```
-
-### Create lookup by importing Athena vocabulary and custom mapping
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -l
-```
-
-This function will import Athena vocabulary files from the path specified in the configuration files (`vocabulary` attribute) in to the lookup schema specified by `lookup_schema_name`.
-
-### Import EHR from a csv files
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -f
-```
-
-This function will import EHR data from csv files from the path specified in the configuration files (under every entity) in to the source schema specified by `source_schema_name`.
-
-### Stage the data on the ETL schema
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -s
-```
-
-This function will stage the data from source schema into the etl schema specified by `etl_schema_name` attrbibute in the configuration file.
-
-### Generate custom mapping of concepts from the data
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -m
-```
-
-This function will automatically generate mappings for the specified vocabularies in the configuration file under `customMapping` attribute and update the vocabulary in the database with mapped automatically concepts.
-
-### Import custom mapping file
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -c
-```
-
-This function will import manually generated custom mappings from the csv file specified under `vocabulary>tmp_custom_mapping` attribute in the configuration file and update the vocabulary in the database with manually mapped concepts.
-
-### Perform migration Extract-Transform-Load (ETL) operations
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -e
-```
-
-This function will perform the Extract-Transform-Load (ETL) operations necessary to format the source data as per the OMOP-CDM schema and stores the final tables in etl schema.
-
-### Unload data to CDM schema
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.Run -u
-```
-
-This function will unload the final tables from the lookup and etl shema to the destination schema called cdm schema.
-
-## Concept Mapping
-
-### To obtain help menu
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper -h
-```
-
-or
-
- ```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper --help
-```
-
-This will display the following help menu;
-
-```
-usage: ConceptMapper.py [-h] [--vocab_path VOCAB_PATH] [--cdb_path CDB_PATH] [--mc_status_path MC_STATUS_PATH] [--model_pack_path MODEL_PACK_PATH]
-                        domain_id vocabulary_id concept_class_id concepts_path concept_name_row mapped_concepts_save_path
-
-Perform concept mapping
-
-positional arguments:
-  domain_id             Domain ID of the standard vocabulary to be mapped
-  vocabulary_id         Vocabulary ID of the standard vocabulary to be mapped
-  concept_class_id      Concept class ID of the standard vocabulary to be mapped
-  concepts_path         Path for the concepts csv file
-  concept_name_row      Name of the concept name row in the concepts csv file
-  mapped_concepts_save_path
-                        Path for saving the mapped concepts csv file
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --vocab_path VOCAB_PATH
-                        Path for the Medcat vocab file
-  --cdb_path CDB_PATH   Path for the Medcat cdb file
-  --mc_status_path MC_STATUS_PATH
-                        Path for the Medcat mc_status folder
-  --model_pack_path MODEL_PACK_PATH
-                        Path for the Medcat model_pack_path zip file
-```
-
-### Generate custom mappings for review
-
-```shell
-.venv/bin/python -m ehrqc.standardise.migrate_omop.ConceptMapper ....
-```
-
-This function will create mappings for the requested concepts and save it as a csv file.
 
 
 ## Acknowledgements
