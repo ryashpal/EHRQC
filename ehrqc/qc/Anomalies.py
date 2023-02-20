@@ -97,7 +97,7 @@ def detect(
                     with tag('h1'):
                         doc.asis('<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>')
                         with tag('Error', klass='fs-4', style="margin: 10px;"):
-                            text('Outlier Analysis')
+                            text('Error Analysis')
                     drawErrorAnalysis(df, df.columns, tag, text)
                 doc.asis('<div style="clear:both;"></div>')
             if inconsistencies:
@@ -114,18 +114,22 @@ def detect(
 
 def __drawSummary(df, colNames):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Column')
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('DataType')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Count')
         for col in colNames:
             with tag('tr'):
-                with tag('td'):
+                with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                     text(col)
-                with tag('td'):
+                with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                     text(str(df[col].dtypes))
+                with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                    text(str(df[col].count()))
 
 
 def __drawOutliers(df, x, y):
@@ -198,27 +202,27 @@ def correct(
 
 def drawMissingAnalysis(df, colNames, tag, text):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Column')
-            with tag('th'):
-                text('Missing Count')
-            with tag('th'):
-                text('Missing Proportion')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Count')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Percentage')
         isMissing = False
         for col in colNames:
             if col in df.columns:
                 with tag('tr'):
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(col)
                     missingCount = df[col].isna().sum()
-                    missingProportion = round(df[col].isna().sum()/df[col].count(), 4)
+                    missingProportion = round(df[col].isna().sum()/df[col].count()*100, 2)
                     if missingCount > 0:
                         isMissing = True
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(str(missingCount))
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(str(missingProportion))
 
     if isMissing:
@@ -231,30 +235,30 @@ def drawMissingAnalysis(df, colNames, tag, text):
 
 def drawOutlierAnalysis(df, colNames, tag, text):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Column')
-            with tag('th'):
-                text('Outlier Count')
-            with tag('th'):
-                text('Outlier Proportion')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Count')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Percentage')
         isOutlier = False
         for col in colNames:
             if col in df.columns:
                 with tag('tr'):
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(col)
                     Q1 = df[col].quantile(0.25)
                     Q3 = df[col].quantile(0.75)
                     IQR = Q3 - Q1
                     outlierCount = df[((df[col] < (Q1 - 1.5 * IQR)) | (df[col] > (Q3 + 1.5 * IQR)))].shape[0]
-                    outlierProportion = round(outlierCount/df[col].count(), 4)
+                    outlierProportion = round(outlierCount/df[col].count()*100, 2)
                     if outlierCount > 0:
                         isOutlier = True
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(str(outlierCount))
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(str(outlierProportion))
 
     if isOutlier:
@@ -267,24 +271,24 @@ def drawOutlierAnalysis(df, colNames, tag, text):
 
 def drawErrorAnalysis(df, colNames, tag, text):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Column')
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Modality')
         isMultimodal = False
         for col in colNames:
             if col in df.columns:
                 with tag('tr'):
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(col)
                     try:
                         dat = np.sort(df[col], axis=0)
                         intervals = UniDip(dat).run()
                     except:
                         intervals = []
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         if len(intervals) > 1:
                             isMultimodal = True
                             text('Multimodal')

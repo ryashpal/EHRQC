@@ -117,19 +117,23 @@ def plot(
 
 def __drawLabMeasurementsSummary(df, colNames):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Column')
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('DataType')
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
+                text('Count')
         for col in colNames:
             if col in df.columns:
                 with tag('tr'):
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(col)
-                    with tag('td'):
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                         text(str(df[col].dtypes))
+                    with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                        text(str(df[col].count()))
 
 
 def __drawLabMeasurementsViolinPlot(df, col):
