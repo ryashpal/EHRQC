@@ -57,14 +57,19 @@ def importPatients(con, sourceSchemaName, filePath, fileSeparator):
 
     df = pd.read_csv(filePath, sep=fileSeparator)
     df.dod.replace({np.nan: None}, inplace=True)
-    dfColumns = [
-        Config.patients['column_mapping']['subject_id'],
-        Config.patients['column_mapping']['gender'],
-        Config.patients['column_mapping']['anchor_age'],
-        Config.patients['column_mapping']['anchor_year'],
-        Config.patients['column_mapping']['anchor_year_group'],
-        Config.patients['column_mapping']['dod'],
-        ]
+    dfColumns = []
+    if(Config.patients['column_mapping']['subject_id']):
+        dfColumns.append(Config.patients['column_mapping']['subject_id'])
+    if(Config.patients['column_mapping']['gender']):
+        dfColumns.append(Config.patients['column_mapping']['gender'])
+    if(Config.patients['column_mapping']['anchor_age']):
+        dfColumns.append(Config.patients['column_mapping']['anchor_age'])
+    if(Config.patients['column_mapping']['anchor_year']):
+        dfColumns.append(Config.patients['column_mapping']['anchor_year'])
+    if(Config.patients['column_mapping']['anchor_year_group']):
+        dfColumns.append(Config.patients['column_mapping']['anchor_year_group'])
+    if(Config.patients['column_mapping']['dod']):
+        dfColumns.append(Config.patients['column_mapping']['dod'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='PATIENTS', df=df, dfColumns=dfColumns)
 
 
@@ -108,23 +113,37 @@ def importAdmissions(con, sourceSchemaName, filePath, fileSeparator):
     df.deathtime.replace({np.nan: None}, inplace=True)
     df.edregtime.replace({np.nan: None}, inplace=True)
     df.edouttime.replace({np.nan: None}, inplace=True)
-    dfColumns = [
-        Config.admissions['column_mapping']['subject_id'],
-        Config.admissions['column_mapping']['hadm_id'],
-        Config.admissions['column_mapping']['admittime'],
-        Config.admissions['column_mapping']['dischtime'],
-        Config.admissions['column_mapping']['deathtime'],
-        Config.admissions['column_mapping']['admission_type'],
-        Config.admissions['column_mapping']['admission_location'],
-        Config.admissions['column_mapping']['discharge_location'],
-        Config.admissions['column_mapping']['insurance'],
-        Config.admissions['column_mapping']['language'],
-        Config.admissions['column_mapping']['marital_status'],
-        Config.admissions['column_mapping']['ethnicity'],
-        Config.admissions['column_mapping']['edregtime'],
-        Config.admissions['column_mapping']['edouttime'],
-        Config.admissions['column_mapping']['hospital_expire_flag'],
-        ]
+    dfColumns = []
+    if(Config.admissions['column_mapping']['subject_id']):
+        dfColumns.append(Config.admissions['column_mapping']['subject_id'])
+    if(Config.admissions['column_mapping']['hadm_id']):
+        dfColumns.append(Config.admissions['column_mapping']['hadm_id'])
+    if(Config.admissions['column_mapping']['admittime']):
+        dfColumns.append(Config.admissions['column_mapping']['admittime'])
+    if(Config.admissions['column_mapping']['dischtime']):
+        dfColumns.append(Config.admissions['column_mapping']['dischtime'])
+    if(Config.admissions['column_mapping']['deathtime']):
+        dfColumns.append(Config.admissions['column_mapping']['deathtime'])
+    if(Config.admissions['column_mapping']['admission_type']):
+        dfColumns.append(Config.admissions['column_mapping']['admission_type'])
+    if(Config.admissions['column_mapping']['admission_location']):
+        dfColumns.append(Config.admissions['column_mapping']['admission_location'])
+    if(Config.admissions['column_mapping']['discharge_location']):
+        dfColumns.append(Config.admissions['column_mapping']['discharge_location'])
+    if(Config.admissions['column_mapping']['insurance']):
+        dfColumns.append(Config.admissions['column_mapping']['insurance'])
+    if(Config.admissions['column_mapping']['language']):
+        dfColumns.append(Config.admissions['column_mapping']['language'])
+    if(Config.admissions['column_mapping']['marital_status']):
+        dfColumns.append(Config.admissions['column_mapping']['marital_status'])
+    if(Config.admissions['column_mapping']['ethnicity']):
+        dfColumns.append(Config.admissions['column_mapping']['ethnicity'])
+    if(Config.admissions['column_mapping']['edregtime']):
+        dfColumns.append(Config.admissions['column_mapping']['edregtime'])
+    if(Config.admissions['column_mapping']['edouttime']):
+        dfColumns.append(Config.admissions['column_mapping']['edouttime'])
+    if(Config.admissions['column_mapping']['hospital_expire_flag']):
+        dfColumns.append(Config.admissions['column_mapping']['hospital_expire_flag'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='ADMISSIONS', df=df, dfColumns=dfColumns)
 
 
@@ -157,15 +176,21 @@ def importTransfers(con, sourceSchemaName, filePath, fileSeparator):
     df = pd.read_csv(filePath, sep=fileSeparator)
     df.intime.replace({np.nan: None}, inplace=True)
     df.outtime.replace({np.nan: None}, inplace=True)
-    dfColumns = [
-        Config.transfers['column_mapping']['subject_id'],
-        Config.transfers['column_mapping']['hadm_id'],
-        Config.transfers['column_mapping']['transfer_id'],
-        Config.transfers['column_mapping']['eventtype'],
-        Config.transfers['column_mapping']['careunit'],
-        Config.transfers['column_mapping']['intime'],
-        Config.transfers['column_mapping']['outtime'],
-        ]
+    dfColumns = []
+    if(Config.transfers['column_mapping']['subject_id']):
+        dfColumns.append(Config.transfers['column_mapping']['subject_id'])
+    if(Config.transfers['column_mapping']['hadm_id']):
+        dfColumns.append(Config.transfers['column_mapping']['hadm_id'])
+    if(Config.transfers['column_mapping']['transfer_id']):
+        dfColumns.append(Config.transfers['column_mapping']['transfer_id'])
+    if(Config.transfers['column_mapping']['eventtype']):
+        dfColumns.append(Config.transfers['column_mapping']['eventtype'])
+    if(Config.transfers['column_mapping']['careunit']):
+        dfColumns.append(Config.transfers['column_mapping']['careunit'])
+    if(Config.transfers['column_mapping']['intime']):
+        dfColumns.append(Config.transfers['column_mapping']['intime'])
+    if(Config.transfers['column_mapping']['outtime']):
+        dfColumns.append(Config.transfers['column_mapping']['outtime'])
     df['hadm_id'] = df['hadm_id'].astype('Int64').fillna(0).astype('int').replace({0: None})
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='TRANSFERS', df=df, dfColumns=dfColumns)
 
@@ -194,13 +219,17 @@ def importDiagnosesIcd(con, sourceSchemaName, filePath, fileSeparator):
     import numpy as np
 
     df = pd.read_csv(filePath, sep=fileSeparator)
-    dfColumns = [
-        Config.diagnoses_icd['column_mapping']['subject_id'],
-        Config.diagnoses_icd['column_mapping']['hadm_id'],
-        Config.diagnoses_icd['column_mapping']['seq_num'],
-        Config.diagnoses_icd['column_mapping']['icd_code'],
-        Config.diagnoses_icd['column_mapping']['icd_version'],
-        ]
+    dfColumns = []
+    if(Config.diagnoses['column_mapping']['subject_id']):
+        dfColumns.append(Config.diagnoses['column_mapping']['subject_id'])
+    if(Config.diagnoses['column_mapping']['hadm_id']):
+        dfColumns.append(Config.diagnoses['column_mapping']['hadm_id'])
+    if(Config.diagnoses['column_mapping']['seq_num']):
+        dfColumns.append(Config.diagnoses['column_mapping']['seq_num'])
+    if(Config.diagnoses['column_mapping']['icd_code']):
+        dfColumns.append(Config.diagnoses['column_mapping']['icd_code'])
+    if(Config.diagnoses['column_mapping']['icd_version']):
+        dfColumns.append(Config.diagnoses['column_mapping']['icd_version'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='DIAGNOSES_ICD', df=df, dfColumns=dfColumns)
 
 
@@ -229,13 +258,17 @@ def importServices(con, sourceSchemaName, filePath, fileSeparator):
 
     df = pd.read_csv(filePath, sep=fileSeparator)
     df.transfertime.replace({np.nan: None}, inplace=True)
-    dfColumns = [
-        Config.services['column_mapping']['subject_id'],
-        Config.services['column_mapping']['hadm_id'],
-        Config.services['column_mapping']['transfertime'],
-        Config.services['column_mapping']['prev_service'],
-        Config.services['column_mapping']['curr_service'],
-        ]
+    dfColumns = []
+    if(Config.services['column_mapping']['subject_id']):
+        dfColumns.append(Config.services['column_mapping']['subject_id'])
+    if(Config.services['column_mapping']['hadm_id']):
+        dfColumns.append(Config.services['column_mapping']['hadm_id'])
+    if(Config.services['column_mapping']['transfertime']):
+        dfColumns.append(Config.services['column_mapping']['transfertime'])
+    if(Config.services['column_mapping']['prev_service']):
+        dfColumns.append(Config.services['column_mapping']['prev_service'])
+    if(Config.services['column_mapping']['curr_service']):
+        dfColumns.append(Config.services['column_mapping']['curr_service'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='SERVICES', df=df, dfColumns=dfColumns)
 
 
@@ -281,23 +314,37 @@ def importLabEvents(con, sourceSchemaName, filePath, fileSeparator, createSchema
     df.charttime.replace({np.nan: None}, inplace=True)
     df.storetime.replace({np.nan: None}, inplace=True)
 
-    dfColumns = [
-        Config.labevents['column_mapping']['labevent_id'],
-        Config.labevents['column_mapping']['subject_id'],
-        Config.labevents['column_mapping']['hadm_id'],
-        Config.labevents['column_mapping']['specimen_id'],
-        Config.labevents['column_mapping']['itemid'],
-        Config.labevents['column_mapping']['charttime'],
-        Config.labevents['column_mapping']['storetime'],
-        Config.labevents['column_mapping']['value'],
-        Config.labevents['column_mapping']['valuenum'],
-        Config.labevents['column_mapping']['valueuom'],
-        Config.labevents['column_mapping']['ref_range_lower'],
-        Config.labevents['column_mapping']['ref_range_upper'],
-        Config.labevents['column_mapping']['flag'],
-        Config.labevents['column_mapping']['priority'],
-        Config.labevents['column_mapping']['comments'],
-        ]
+    dfColumns = []
+    if(Config.labevents['column_mapping']['labevent_id']):
+        dfColumns.append(Config.labevents['column_mapping']['labevent_id'])
+    if(Config.labevents['column_mapping']['subject_id']):
+        dfColumns.append(Config.labevents['column_mapping']['subject_id'])
+    if(Config.labevents['column_mapping']['hadm_id']):
+        dfColumns.append(Config.labevents['column_mapping']['hadm_id'])
+    if(Config.labevents['column_mapping']['specimen_id']):
+        dfColumns.append(Config.labevents['column_mapping']['specimen_id'])
+    if(Config.labevents['column_mapping']['itemid']):
+        dfColumns.append(Config.labevents['column_mapping']['itemid'])
+    if(Config.labevents['column_mapping']['charttime']):
+        dfColumns.append(Config.labevents['column_mapping']['charttime'])
+    if(Config.labevents['column_mapping']['storetime']):
+        dfColumns.append(Config.labevents['column_mapping']['storetime'])
+    if(Config.labevents['column_mapping']['value']):
+        dfColumns.append(Config.labevents['column_mapping']['value'])
+    if(Config.labevents['column_mapping']['valuenum']):
+        dfColumns.append(Config.labevents['column_mapping']['valuenum'])
+    if(Config.labevents['column_mapping']['valueuom']):
+        dfColumns.append(Config.labevents['column_mapping']['valueuom'])
+    if(Config.labevents['column_mapping']['ref_range_lower']):
+        dfColumns.append(Config.labevents['column_mapping']['ref_range_lower'])
+    if(Config.labevents['column_mapping']['ref_range_upper']):
+        dfColumns.append(Config.labevents['column_mapping']['ref_range_upper'])
+    if(Config.labevents['column_mapping']['flag']):
+        dfColumns.append(Config.labevents['column_mapping']['flag'])
+    if(Config.labevents['column_mapping']['priority']):
+        dfColumns.append(Config.labevents['column_mapping']['priority'])
+    if(Config.labevents['column_mapping']['comments']):
+        dfColumns.append(Config.labevents['column_mapping']['comments'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='LABEVENTS', df=df, dfColumns=dfColumns)
 
 
@@ -325,13 +372,17 @@ def importLabItems(con, sourceSchemaName, filePath, fileSeparator):
     import pandas as pd
 
     df = pd.read_csv(filePath, sep=fileSeparator)
-    dfColumns = [
-        Config.d_labitems['column_mapping']['itemid'],
-        Config.d_labitems['column_mapping']['label'],
-        Config.d_labitems['column_mapping']['fluid'],
-        Config.d_labitems['column_mapping']['category'],
-        Config.d_labitems['column_mapping']['loinc_code'],
-        ]
+    dfColumns = []
+    if(Config.labitems_lookup['column_mapping']['itemid']):
+        dfColumns.append(Config.labitems_lookup['column_mapping']['itemid'])
+    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+        dfColumns.append(Config.labitems_lookup['column_mapping']['label'])
+    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+        dfColumns.append(Config.labitems_lookup['column_mapping']['fluid'])
+    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+        dfColumns.append(Config.labitems_lookup['column_mapping']['category'])
+    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+        dfColumns.append(Config.labitems_lookup['column_mapping']['loinc_code'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='D_LABITEMS', df=df, dfColumns=dfColumns)
 
 
@@ -360,12 +411,12 @@ def importProcedures(con, sourceSchemaName, filePath, fileSeparator):
 
     df = pd.read_csv(filePath, sep=fileSeparator)
     dfColumns = [
-        Config.procedures_icd['column_mapping']['subject_id'],
-        Config.procedures_icd['column_mapping']['hadm_id'],
-        Config.procedures_icd['column_mapping']['seq_num'],
-        Config.procedures_icd['column_mapping']['chartdate'],
-        Config.procedures_icd['column_mapping']['icd_code'],
-        Config.procedures_icd['column_mapping']['icd_version'],
+        Config.procedures['column_mapping']['subject_id'],
+        Config.procedures['column_mapping']['hadm_id'],
+        Config.procedures['column_mapping']['seq_num'],
+        Config.procedures['column_mapping']['chartdate'],
+        Config.procedures['column_mapping']['icd_code'],
+        Config.procedures['column_mapping']['icd_version'],
         ]
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='PROCEDURES_ICD', df=df, dfColumns=dfColumns)
 
@@ -434,13 +485,13 @@ def importDrugCodes(con, sourceSchemaName, filePath, fileSeparator):
     df['drg_severity'] = df['drg_severity'].astype('Int64').fillna(0).astype('int').replace({0: None})
     df['drg_mortality'] = df['drg_mortality'].astype('Int64').fillna(0).astype('int').replace({0: None})
     dfColumns = [
-        Config.drgcodes['column_mapping']['subject_id'],
-        Config.drgcodes['column_mapping']['hadm_id'],
-        Config.drgcodes['column_mapping']['drg_type'],
-        Config.drgcodes['column_mapping']['drg_code'],
-        Config.drgcodes['column_mapping']['description'],
-        Config.drgcodes['column_mapping']['drg_severity'],
-        Config.drgcodes['column_mapping']['drg_mortality'],
+        Config.drugcodes['column_mapping']['subject_id'],
+        Config.drugcodes['column_mapping']['hadm_id'],
+        Config.drugcodes['column_mapping']['drg_type'],
+        Config.drugcodes['column_mapping']['drg_code'],
+        Config.drugcodes['column_mapping']['description'],
+        Config.drugcodes['column_mapping']['drg_severity'],
+        Config.drugcodes['column_mapping']['drg_mortality'],
         ]
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='DRGCODES', df=df, dfColumns=dfColumns)
 
@@ -795,15 +846,15 @@ def importItems(con, sourceSchemaName, filePath, fileSeparator):
 
     df = pd.read_csv(filePath, sep=fileSeparator)
     dfColumns = [
-        Config.d_items['column_mapping']['itemid'],
-        Config.d_items['column_mapping']['label'],
-        Config.d_items['column_mapping']['abbreviation'],
-        Config.d_items['column_mapping']['linksto'],
-        Config.d_items['column_mapping']['category'],
-        Config.d_items['column_mapping']['unitname'],
-        Config.d_items['column_mapping']['param_type'],
-        Config.d_items['column_mapping']['lownormalvalue'],
-        Config.d_items['column_mapping']['highnormalvalue'],
+        Config.items_lookup['column_mapping']['itemid'],
+        Config.items_lookup['column_mapping']['label'],
+        Config.items_lookup['column_mapping']['abbreviation'],
+        Config.items_lookup['column_mapping']['linksto'],
+        Config.items_lookup['column_mapping']['category'],
+        Config.items_lookup['column_mapping']['unitname'],
+        Config.items_lookup['column_mapping']['param_type'],
+        Config.items_lookup['column_mapping']['lownormalvalue'],
+        Config.items_lookup['column_mapping']['highnormalvalue'],
         ]
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='D_ITEMS', df=df, dfColumns=dfColumns)
 
@@ -962,42 +1013,49 @@ def importChartEvents(con, sourceSchemaName, filePath, fileSeparator, createSche
 
 
 def importDataCsv(con, sourceSchemaName):
-    importPatients(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.patients['file_name'],
-        fileSeparator=','
-        )
-    importAdmissions(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.admissions['file_name'],
-        fileSeparator=','
-        )
-    importTransfers(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.transfers['file_name'],
-        fileSeparator=','
-        )
-    importDiagnosesIcd(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.diagnoses_icd['file_name'],
-        fileSeparator=','
-        )
-    importServices(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.services['file_name'],
-        fileSeparator=','
-        )
-    importLabEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.labevents['file_name'],
-        fileSeparator=','
-        )
+
+    if(Config.patients['file_name']):
+        importPatients(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.patients['file_name'],
+            fileSeparator=','
+            )
+    if(Config.admissions['file_name']):
+        importAdmissions(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.admissions['file_name'],
+            fileSeparator=','
+            )
+    if(Config.transfers['file_name']):
+        importTransfers(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.transfers['file_name'],
+            fileSeparator=','
+            )
+    if(Config.diagnoses['file_name']):
+        importDiagnosesIcd(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.diagnoses['file_name'],
+            fileSeparator=','
+            )
+    if(Config.services['file_name']):
+        importServices(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.services['file_name'],
+            fileSeparator=','
+            )
+    if(Config.labevents['file_name']):
+        importLabEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.labevents['file_name'],
+            fileSeparator=','
+            )
     # i = 'a'
     # filePath = '/superbugai-data/mimiciv/1.0/hosp/xa'
     # importLabEvents(
@@ -1015,72 +1073,83 @@ def importDataCsv(con, sourceSchemaName):
     #         fileSeparator=',',
     #         createSchema=False
     #         )
-    importLabItems(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.d_labitems['file_name'],
-        fileSeparator=','
-        )
-    importProcedures(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.procedures_icd['file_name'],
-        fileSeparator=','
-        )
-    importHcpcsEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.hcpcsevents['file_name'],
-        fileSeparator=','
-        )
-    importDrugCodes(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.drgcodes['file_name'],
-        fileSeparator=','
-        )
-    importPrescriptions(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.prescriptions['file_name'],
-        fileSeparator=','
-        )
-    importMicrobiologyEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.microbiologyevents['file_name'],
-        fileSeparator=','
-        )
-    importPharmacy(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.pharmacy['file_name'],
-        fileSeparator=','
-        )
-    importProcedureEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.procedureevents['file_name'],
-        fileSeparator=','
-        )
-    importItems(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.d_items['file_name'],
-        fileSeparator=','
-        )
-    importDatetimeEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.datetimeevents['file_name'],
-        fileSeparator=','
-        )
-    importChartEvents(
-        con=con,
-        sourceSchemaName=sourceSchemaName,
-        filePath = Config.chartevents['file_name'],
-        fileSeparator=','
-        )
+    if(Config.labitems_lookup['file_name']):
+        importLabItems(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.labitems_lookup['file_name'],
+            fileSeparator=','
+            )
+    if(Config.procedures['file_name']):
+        importProcedures(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.procedures['file_name'],
+            fileSeparator=','
+            )
+    if(Config.hcpcsevents['file_name']):
+        importHcpcsEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.hcpcsevents['file_name'],
+            fileSeparator=','
+            )
+    if(Config.drugcodes['file_name']):
+        importDrugCodes(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.drugcodes['file_name'],
+            fileSeparator=','
+            )
+    if(Config.prescriptions['file_name']):
+        importPrescriptions(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.prescriptions['file_name'],
+            fileSeparator=','
+            )
+    if(Config.microbiologyevents['file_name']):
+        importMicrobiologyEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.microbiologyevents['file_name'],
+            fileSeparator=','
+            )
+    if(Config.pharmacy['file_name']):
+        importPharmacy(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.pharmacy['file_name'],
+            fileSeparator=','
+            )
+    if(Config.procedureevents['file_name']):
+        importProcedureEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.procedureevents['file_name'],
+            fileSeparator=','
+            )
+    if(Config.items_lookup['file_name']):
+        importItems(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.items_lookup['file_name'],
+            fileSeparator=','
+            )
+    if(Config.datetimeevents['file_name']):
+        importDatetimeEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.datetimeevents['file_name'],
+            fileSeparator=','
+            )
+    if(Config.chartevents['file_name']):
+        importChartEvents(
+            con=con,
+            sourceSchemaName=sourceSchemaName,
+            filePath = Config.chartevents['file_name'],
+            fileSeparator=','
+            )
     # filePath = '/superbugai-data/mimiciv/1.0/icu/xaa'
     # importChartEvents(
     #     con=con,

@@ -29,8 +29,7 @@ def irt_ensemble(data):
 
 if __name__ == '__main__':
     import pandas as pd
-    data = pd.read_csv('/home/yram0006/phd/chapter_1/workspace/EHRQC/temp/mimic_vitals_imputed.csv')
-    df = pd.DataFrame(data, columns=['id' ,'stay_id' ,'heartrate' ,'sysbp' ,'diabp' ,'meanbp' ,'resprate' ,'tempc' ,'spo2' ,'gcseye' ,'gcsverbal' ,'gcsmotor'])
-
-    out = irt_ensemble(df[['heartrate' ,'sysbp' ,'diabp' ,'meanbp' ,'resprate' ,'tempc' ,'spo2' ,'gcseye' ,'gcsverbal' ,'gcsmotor']])
+    data = pd.read_csv('/home/yram0006/phd/chapter_1/workspace/EHRQC/temp/test_cm_corrected.csv')
+    df = pd.DataFrame(data, columns=['heartrate', 'sysbp', 'diabp', 'meanbp'])
+    out = irt_ensemble(df[['heartrate', 'sysbp', 'diabp', 'meanbp']])
     out.to_csv('/home/yram0006/phd/chapter_1/workspace/EHRQC/temp/mimic_vitals_irt.csv')

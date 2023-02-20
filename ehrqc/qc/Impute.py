@@ -1,6 +1,6 @@
 import logging
 
-log = logging.getLogger("EHRQC")
+log = logging.getLogger("Anomalies")
 
 import numpy as np
 import pandas as pd
@@ -14,8 +14,22 @@ from sklearn.impute import KNNImputer
 from sklearn.impute import SimpleImputer
 from ehrqc.Utils import MissForest
 
+import warnings
+warnings.filterwarnings("ignore")
 
-def compare(fullDf, p=0.1):
+
+def compare(fullDf, p=None):
+
+    if not p:
+        if fullDf.isna().sum().mean() > 0:
+            p = fullDf.isna().sum().mean()/fullDf.shape[0]
+        else:
+            p = 0.1
+
+    log.info('Creating missingness with proportion p = (' + str(p) + ')')
+
+    fullDf.dropna(inplace=True)
+
     mask = np.random.choice(a=[True, False], size=fullDf.shape, p=[p, 1-p])
     missingDf = fullDf.mask(mask)
 
@@ -27,7 +41,7 @@ def compare(fullDf, p=0.1):
         meanR2 = r2_score(fullDf, meanImputedDf)
         log.info('Mean imputation R2 score: ' + str(meanR2))
     except:
-        log.info('Mean imputation failed!!')
+        log.exception('Mean imputation failed!!')
         meanR2 = 0
 
 
@@ -39,7 +53,7 @@ def compare(fullDf, p=0.1):
         medianR2 = r2_score(fullDf, medianImputedDf)
         log.info('Median imputation R2 score: ' + str(medianR2))
     except:
-        log.info('Median imputation failed!!')
+        log.exception('Median imputation failed!!')
         medianR2 = 0
 
     try:
@@ -50,7 +64,7 @@ def compare(fullDf, p=0.1):
         knnR2 = r2_score(fullDf, knnImputedDf)
         log.info('KNN imputation R2 score: ' + str(knnR2))
     except:
-        log.info('KNN imputation failed!!')
+        log.exception('KNN imputation failed!!')
         knnR2 = 0
 
     try:
@@ -61,7 +75,7 @@ def compare(fullDf, p=0.1):
         mfR2 = r2_score(fullDf, mfImputedDf)
         log.info('MissForest imputation R2 score: ' + str(mfR2))
     except:
-        log.info('MissForest imputation failed!!')
+        log.exception('MissForest imputation failed!!')
         mfR2 = 0
 
     try:
@@ -71,7 +85,7 @@ def compare(fullDf, p=0.1):
         emR2 = r2_score(fullDf, emImputedDataDf)
         log.info('EM imputation R2 score: ' + str(emR2))
     except:
-        log.info('EM imputation failed!!')
+        log.exception('EM imputation failed!!')
         emR2 = 0
 
     try:
@@ -88,7 +102,7 @@ def compare(fullDf, p=0.1):
         miR2 = r2_score(fullDf, miImputedDf)
         log.info('MI imputation R2 score: ' + str(miR2))
     except:
-        log.info('MI imputation failed!!')
+        log.exception('MI imputation failed!!')
         miR2 = 0
 
     return meanR2, medianR2, knnR2, mfR2, emR2, miR2

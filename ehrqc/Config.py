@@ -79,7 +79,7 @@ transfers = {
     },
 }
 
-diagnoses_icd = {
+diagnoses = {
     'file_name': '/superbugai-data/mimiciv/test_data/diagnoses_icd.csv',
     'column_mapping': {
         'subject_id': 'subject_id',
@@ -122,7 +122,7 @@ labevents = {
     },
 }
 
-d_labitems = {
+labitems_lookup = {
     'file_name': '/superbugai-data/mimiciv/test_data/d_labitems.csv',
     'column_mapping': {
         'itemid': 'itemid',
@@ -133,7 +133,7 @@ d_labitems = {
     },
 }
 
-procedures_icd = {
+procedures = {
     'file_name': '/superbugai-data/mimiciv/test_data/procedures_icd.csv',
     'column_mapping': {
         'subject_id': 'subject_id',
@@ -157,7 +157,7 @@ hcpcsevents = {
     },
 }
 
-drgcodes = {
+drugcodes = {
     'file_name': '/superbugai-data/mimiciv/test_data/drgcodes.csv',
     'column_mapping': {
         'subject_id': 'subject_id',
@@ -288,7 +288,7 @@ procedureevents = {
     },
 }
 
-d_items = {
+items_lookup = {
     'file_name': '/superbugai-data/mimiciv/test_data/d_items.csv',
     'column_mapping': {
         'itemid': 'itemid',
