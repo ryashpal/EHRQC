@@ -1,5 +1,7 @@
 from unidip import UniDip
 
+import time
+
 import logging
 import sys
 
@@ -43,6 +45,8 @@ def detect(
     inconsistencies = False,
     outputFile = 'anomalies.html',
     ):
+    
+    start = time.time()
 
     doc.asis('<!DOCTYPE html>')
     with tag('html'):
@@ -108,6 +112,11 @@ def detect(
                             text('Inconsistencies Analysis')
                     drawInconsistenciesAnalysis(df, tag, text)
                 doc.asis('<div style="clear:both;"></div>')
+            with tag('div'):
+                with tag('span', klass='description', style="margin: 10px; color:grey"):
+                    with tag('small'):
+                        text('Time taken to generate this report: ' + str(round(time.time() - start, 2)) + ' Sec')
+            doc.asis('<div style="clear:both;"></div>')
     with open(outputFile, 'w') as output:
         output.write(doc.getvalue())
 

@@ -1,3 +1,4 @@
+import time
 import base64
 import numpy as np
 from io import BytesIO
@@ -79,6 +80,7 @@ def plot(
         white_blood_cellsCol = column_mapping['white_blood_cells']
 
     colNames = [glucoseCol, hemoglobinCol, anion_gapCol, bicarbonateCol, calcium_totalCol, chlorideCol, creatinineCol, magnesiumCol, phosphateCol, potassiumCol, sodiumCol, urea_nitrogenCol, hematocritCol, mchCol, mchcCol, mcvCol, platelet_countCol, rdwCol, red_blood_cellsCol, white_blood_cellsCol]
+    start = time.time()
 
     doc.asis('<!DOCTYPE html>')
     with tag('html'):
@@ -110,6 +112,11 @@ def plot(
                     with tag('span', klass='fs-4', style="margin: 10px;"):
                         text('Missing Data Plot')
                 doc.asis('<img src=\'data:image/png;base64,{}\'>'.format(drawMissingDataPlot(df)))
+            doc.asis('<div style="clear:both;"></div>')
+            with tag('div'):
+                with tag('span', klass='description', style="margin: 10px; color:grey"):
+                    with tag('small'):
+                        text('Time taken to generate this report: ' + str(round(time.time() - start, 2)) + ' Sec')
             doc.asis('<div style="clear:both;"></div>')
     with open(outputFile, 'w') as output:
         output.write(doc.getvalue())
