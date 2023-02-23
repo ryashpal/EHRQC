@@ -328,7 +328,7 @@ def drawInconsistenciesAnalysis(df, tag, text):
                         text('Percentage')
                 errorDict = ErrorConfig.boundaries[col]
                 for key in errorDict.keys():
-                    (lower, upper) = errorDict[key]
+                    (lower, upper) = errorDict[key][0]
                     filteredCol = []
                     if (lower) and (not upper):
                         filteredCol = df[df[col] > lower]
@@ -350,11 +350,11 @@ def drawInconsistenciesAnalysis(df, tag, text):
                             text(percent)
             doc.asis('<div style="clear:both;"></div>')
             with tag('div', klass='col-5', style="float: left;"):
-                doc.asis('<img src=\'data:image/png;base64,{}\'>'.format(__drawLinePlot(df, col)))
+                doc.asis('<img src=\'data:image/png;base64,{}\'>'.format(__drawKdePlot(df, col)))
             doc.asis('<div style="clear:both;"></div>')
 
 
-def __drawLinePlot(df, col):
+def __drawKdePlot(df, col):
 
     fig, ax = plt.subplots()
     sns.kdeplot(
@@ -363,7 +363,18 @@ def __drawLinePlot(df, col):
         ax = ax,
     )
 
-    ax.set_title('Line Plot - ' + col)
+    if col in ErrorConfig.boundaries:
+        errorDict = ErrorConfig.boundaries[col]
+        for key in errorDict.keys():
+            (lower, upper) = errorDict[key][0]
+            if lower:
+                plt.axvline(lower, linestyle=':')
+                plt.text(lower+(lower*0.01), 0, errorDict[key][1], rotation=90)
+            if upper:
+                plt.axvline(upper, linestyle=':')
+                plt.text(upper-(upper*0.01), 0, errorDict[key][1], rotation=90)
+
+    ax.set_title('KDE Plot - ' + col)
     ax.set_xlabel(col)
     ax.set_ylabel('Value')
 
