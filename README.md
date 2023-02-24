@@ -1,5 +1,7 @@
 # **EHRQC**
 
+## Introduction
+
 EHR-QC is a complete end-to-end pipeline to standardise and preprocess Electronic Health Records (EHR) for downstream integrative machine learning applications. This utility has two distinct modules;
 
 1. Standardisation
@@ -11,9 +13,7 @@ This utility is primarily focussed to provide a domain specific toolset for perf
 
 ## Workflow
 
-![image](https://user-images.githubusercontent.com/56529301/215373211-c7a311f8-e8ed-4740-a565-1bedfe512ec8.png)
-
-
+![image](https://user-images.githubusercontent.com/56529301/221063465-197ae07f-906e-4482-9969-954a090df2f9.png)
 
 ## Quick Start Guide
 
