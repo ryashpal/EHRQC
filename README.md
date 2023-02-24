@@ -42,6 +42,14 @@ For the most up-to-date documentation about installation, configuration, running
 
 ## Acknowledgements
 
+Our special thanks to;
+
+* [`OHDSI`](https://www.ohdsi.org/)
+* [`MIMIC IV`](https://physionet.org/content/mimiciv)
+* [`Hugging face`](https://huggingface.co/)
+* [`Medcat`](https://github.com/CogStack/MedCAT)
+* [`Item Response Theory (IRT) - outlierensembles`](https://cran.r-project.org/web/packages/outlierensembles/index.html)
+
 <img src="https://user-images.githubusercontent.com/56529301/155898403-c453ab3f-df17-45c8-ac0a-b314461f5e8f.png" 
 alt="the-alfred-hospital-logo" width="100"/>
 <img src="https://user-images.githubusercontent.com/56529301/155898442-ba8dcbb1-14dd-4c8b-96e6-e02c6a632c0e.png" alt="the-alfred-hospital-logo" width="150"/>
