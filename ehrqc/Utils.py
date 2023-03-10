@@ -35,7 +35,7 @@ def drawMissingDataPlot(df):
 
     fig, ax = plt.subplots()
 
-    msno.matrix(df = df, ax = ax, color=(0.27, 0.51, 0.70))
+    msno.matrix(df = df, ax = ax, color=(0.6968, 0.1408, 0.1625))
 
     ax.set_title('Missing Data Plot')
     ax.set_xlabel('Attribute')

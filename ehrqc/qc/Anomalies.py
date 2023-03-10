@@ -361,6 +361,7 @@ def __drawKdePlot(df, col):
         data = df,
         x = col,
         ax = ax,
+        color='EE6677'
     )
 
     if col in ErrorConfig.boundaries:
@@ -368,10 +369,10 @@ def __drawKdePlot(df, col):
         for key in errorDict.keys():
             (lower, upper) = errorDict[key][0]
             if lower:
-                plt.axvline(lower, linestyle=':')
+                plt.axvline(lower, linestyle=':', color='EE6677')
                 plt.text(lower+(lower*0.01), 0, errorDict[key][1], rotation=90)
             if upper:
-                plt.axvline(upper, linestyle=':')
+                plt.axvline(upper, linestyle=':', color='EE6677')
                 plt.text(upper-(upper*0.01), 0, errorDict[key][1], rotation=90)
 
     ax.set_title('KDE Plot - ' + col)
