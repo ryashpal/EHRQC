@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from yattag import Doc
 
-from ehrqc.Utils import drawMissingDataPlot
+from ehrqc.Utils import drawMissingDataPlot, drawSummaryTable
 
 
 doc, tag, text = Doc().tagtext()
@@ -73,7 +73,7 @@ def plot(
                         with tag('div', klass='col-5', style="float: left;"):
                             doc.asis('<img src=\'data:image/png;base64,{}\'>'.format(__drawVitalsViolinPlot(df, col)))
                         with tag('div', klass='col-2', style="float: left;"):
-                            __drawVitalsTable(df, col)
+                            drawSummaryTable(df, tag, text, col)
                 doc.asis('<div style="clear:both;"></div>')
             with tag('div'):
                 with tag('h1'):
@@ -130,35 +130,3 @@ def __drawVitalsViolinPlot(df, col):
 
     return encoded
 
-
-def __drawVitalsTable(df, col):
-
-    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
-        with tag('tr'):
-            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
-                text('Statistics - ' + col)
-        with tag('tr'):
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text('First Quartile')
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text(str(round(df[col].quantile(0.25), 2)))
-        with tag('tr'):
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text('Mean')
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text(str(round(df[col].mean(), 2)))
-        with tag('tr'):
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text('Median')
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text(str(round(df[col].median(), 2)))
-        with tag('tr'):
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text('Mode')
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text(str(round(df[col].mode()[0], 2)))
-        with tag('tr'):
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text('Third Quartile')
-            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
-                text(str(round(df[col].quantile(0.75), 2)))

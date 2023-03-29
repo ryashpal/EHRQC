@@ -35,7 +35,7 @@ def drawMissingDataPlot(df):
 
     fig, ax = plt.subplots()
 
-    msno.matrix(df = df, ax = ax, color=(0.6968, 0.1408, 0.1625))
+    msno.matrix(df = df, ax = ax, color=(0.27, 0.51, 0.70))
 
     ax.set_title('Missing Data Plot')
     ax.set_xlabel('Attribute')
@@ -50,54 +50,64 @@ def drawMissingDataPlot(df):
 
 def drawSummaryTable(df, tag, text, col):
 
-    with tag('table table-dark'):
+    with tag('table table-dark', style='border: 1px solid black; border-collapse: collapse'):
         with tag('tr'):
-            with tag('th'):
+            with tag('th', style='border: 1px solid black; border-collapse: collapse'):
                 text('Statistics - ' + col)
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                text('Minimum')
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                text(str(round(df[col].min())))
+        with tag('tr'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('First Quartile')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].quantile(0.25), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Mean')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].mean(), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Median')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].median(), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Mode')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].mode()[0], 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Third Quartile')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].quantile(0.75), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                text('Maximum')
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
+                text(str(round(df[col].max())))
+        with tag('tr'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Standard Deviation')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].std(), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Variance')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].var(), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Skew')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].skew(), 2)))
         with tag('tr'):
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text('Kurtosis')
-            with tag('td'):
+            with tag('td', style='border: 1px solid black; border-collapse: collapse'):
                 text(str(round(df[col].kurtosis(), 2)))
 
 
