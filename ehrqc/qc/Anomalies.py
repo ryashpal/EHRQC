@@ -204,7 +204,7 @@ def correct(
         if imputedDf is not None:
             if not imputedDf.empty:
                 outliersDf = irt_ensemble(imputedDf)
-                outliersDf = outliersDf[(np.abs(stats.zscore(outliersDf.ensemble_scores)) < 2)]
+                outliersDf = outliersDf[(np.abs(stats.zscore(outliersDf.ensemble_scores)) < 1)]
 
     outliersDf.to_csv(outputFile, index=False)
 
@@ -442,3 +442,5 @@ if __name__ == "__main__":
             outliers=args.correct_outliers,
             outputFile=args.save_path[0] + '/' + args.save_prefix[0] + '_corrected.csv'
         )
+
+    log.info("Done!!")
