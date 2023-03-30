@@ -396,7 +396,7 @@ if __name__ == "__main__":
     parser.add_argument('save_path', nargs=1, default='temp',
                         help='Path to save the data')
     parser.add_argument('save_prefix', nargs=1, default='ehrqc',
-                        help='Path to save the data')
+                        help='Prefix to the saved file')
     parser.add_argument('-dm', '--detect_missing', action='store_true',
                         help='Detect Missing Values in the dataframe')
     parser.add_argument('-do', '--detect_outliers', action='store_true',
