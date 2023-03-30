@@ -5,7 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 def rescale(source_path, columns, save_path, scaler_save_path, min, max):
-    dataDf = pd.read_csv(source_path, index=False)
+    dataDf = pd.read_csv(source_path)
     scaler = MinMaxScaler(feature_range=(min, max))
     cols = []
     if columns:
@@ -15,7 +15,7 @@ def rescale(source_path, columns, save_path, scaler_save_path, min, max):
     scaler.fit(dataDf[cols])
     rescaledData = scaler.transform(dataDf[cols])
     rescaledDf = pd.concat([dataDf[dataDf.columns[~dataDf.columns.isin(cols)]], pd.DataFrame(rescaledData, columns=cols)], axis=1)
-    rescaledDf.to_csv(save_path, index=None)
+    rescaledDf.to_csv(save_path, index=False)
     if scaler_save_path:
         joblib.dump(scaler, scaler_save_path)
 
@@ -40,21 +40,21 @@ if __name__ == '__main__':
 
     parser.add_argument('source_path', help='Source data path (csv file)')
 
-    parser.add_argument('columns', help='Names of the columns to be scaled, enclosed in double quotes and seperated by comma')
-
     parser.add_argument('save_path', help='Path of a file to store the rescaled output')
+
+    parser.add_argument('-c', '--columns', help='Names of the columns to be scaled, enclosed in double quotes and seperated by comma')
 
     parser.add_argument('-ssp', '--scaler_save_path', help='Path of the scaler to save')
 
-    parser.add_argument('-mi', '--min', default=0, help='Minimum value for the scaler')
+    parser.add_argument('-mi', '--min', default=0, help='Minimum value for the scaler (Default = 0)')
 
-    parser.add_argument('-ma', '--max', default=1, help='Maximum value for the scaler')
+    parser.add_argument('-ma', '--max', default=1, help='Maximum value for the scaler (Default = 1)')
 
     args = parser.parse_args()
 
     log.info('args.source_path: ' + str(args.source_path))
-    log.info('args.columns: ' + str(args.columns))
     log.info('args.save_path: ' + str(args.save_path))
+    log.info('args.columns: ' + str(args.columns))
     log.info('args.scaler_save_path: ' + str(args.scaler_save_path))
     log.info('args.min: ' + str(args.min))
     log.info('args.max: ' + str(args.max))

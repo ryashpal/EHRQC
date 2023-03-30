@@ -5,7 +5,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 def standardise(source_path, columns, save_path, scaler_save_path):
-    dataDf = pd.read_csv(source_path, index=False)
+    dataDf = pd.read_csv(source_path)
     scaler = StandardScaler()
     cols = []
     if columns:
@@ -15,7 +15,7 @@ def standardise(source_path, columns, save_path, scaler_save_path):
     scaler.fit(dataDf[cols])
     standardisedData = scaler.transform(dataDf[cols])
     standardisedDf = pd.concat([dataDf[dataDf.columns[~dataDf.columns.isin(cols)]], pd.DataFrame(standardisedData, columns=cols)], axis=1)
-    standardisedDf.to_csv(save_path, index=None)
+    standardisedDf.to_csv(save_path, index=False)
     if scaler_save_path:
         joblib.dump(scaler, scaler_save_path)
 
@@ -40,17 +40,17 @@ if __name__ == '__main__':
 
     parser.add_argument('source_path', help='Source data path (csv file)')
 
-    parser.add_argument('columns', help='Names of the columns to be scaled, enclosed in double quotes and seperated by comma')
-
     parser.add_argument('save_path', help='Path of a file to store the standardised output')
+
+    parser.add_argument('-c', '--columns', help='Names of the columns to be scaled, enclosed in double quotes and seperated by comma')
 
     parser.add_argument('-ssp', '--scaler_save_path', help='Path of the scaler to save')
 
     args = parser.parse_args()
 
     log.info('args.source_path: ' + str(args.source_path))
-    log.info('args.columns: ' + str(args.columns))
     log.info('args.save_path: ' + str(args.save_path))
+    log.info('args.columns: ' + str(args.columns))
     log.info('args.scaler_save_path: ' + str(args.scaler_save_path))
 
     standardise(source_path=args.source_path, columns=args.columns, save_path=args.save_path, scaler_save_path=args.scaler_save_path)
