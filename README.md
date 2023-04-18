@@ -13,7 +13,7 @@ This utility is primarily focussed to provide a domain specific toolset for perf
 
 ## Workflow
 
-![image](https://user-images.githubusercontent.com/56529301/221063465-197ae07f-906e-4482-9969-954a090df2f9.png)
+![ehr-qc](https://user-images.githubusercontent.com/56529301/232653693-0a3a778e-3b74-4b28-b352-f22bcecd2111.PNG)
 
 ## Quick Start Guide
 
