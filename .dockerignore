@@ -1,0 +1,5 @@
+**/.git
+**/.venv
+**/.vscode
+notebooks
+ehrqc/standardise/migrate_omop/data

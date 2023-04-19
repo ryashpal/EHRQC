@@ -1,0 +1,12 @@
+# Refer: https://medium.com/swlh/dockerize-your-python-command-line-program-6a273f5c5544
+
+version: "3.8"
+services:
+  app:
+    build: .
+    image: ehr-qc
+    network_mode: "host"
+    volumes:
+      - ./data:/home/app_user/data
+    stdin_open: true
+    tty: true
