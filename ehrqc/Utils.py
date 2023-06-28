@@ -3,6 +3,7 @@ import numpy as np
 from io import BytesIO
 from matplotlib import pyplot as plt
 import missingno as msno
+from pathlib import Path
 
 import warnings
 
@@ -31,7 +32,7 @@ def getConnection():
     return con
 
 
-def drawMissingDataPlot(df):
+def drawMissingDataPlot(df, outputFile):
 
     fig, ax = plt.subplots()
 
@@ -41,9 +42,11 @@ def drawMissingDataPlot(df):
     ax.set_xlabel('Attribute')
     ax.set_ylabel('Missing Value Proportion')
 
-    tempFile = BytesIO()
-    fig.savefig(tempFile, format='png', bbox_inches='tight')
-    encoded = base64.b64encode(tempFile.getvalue()).decode('utf-8')
+    encoded = None
+    outPath = Path(Path(outputFile).parent, 'missing_data' + '.png')
+    fig.savefig(outPath, format='png', bbox_inches='tight')
+    with open(outPath, "rb") as outFile:
+        encoded = base64.b64encode(outFile.read()).decode('utf-8')
 
     return encoded
 
