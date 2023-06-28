@@ -32,23 +32,23 @@ def plot(
 
     if 'heartrate' in column_mapping:
         heartrateCol = column_mapping['heartrate']
-    elif 'sysbp' in column_mapping:
+    if 'sysbp' in column_mapping:
         sysbpCol = column_mapping['sysbp']
-    elif 'diabp' in column_mapping:
+    if 'diabp' in column_mapping:
         diabpCol = column_mapping['diabp']
-    elif 'meanbp' in column_mapping:
+    if 'meanbp' in column_mapping:
         meanbpCol = column_mapping['meanbp']
-    elif 'resprate' in column_mapping:
+    if 'resprate' in column_mapping:
         resprateCol = column_mapping['resprate']
-    elif 'tempc' in column_mapping:
+    if 'tempc' in column_mapping:
         tempcCol = column_mapping['tempc']
-    elif 'spo2' in column_mapping:
+    if 'spo2' in column_mapping:
         spo2Col = column_mapping['spo2']
-    elif 'gcseye' in column_mapping:
+    if 'gcseye' in column_mapping:
         gcseyeCol = column_mapping['gcseye']
-    elif 'gcsverbal' in column_mapping:
+    if 'gcsverbal' in column_mapping:
         gcsverbalCol = column_mapping['gcsverbal']
-    elif 'gcsmotor' in column_mapping:
+    if 'gcsmotor' in column_mapping:
         gcsmotorCol = column_mapping['gcsmotor']
 
     colNames = [heartrateCol, sysbpCol, diabpCol, meanbpCol, resprateCol, tempcCol, spo2Col, gcseyeCol, gcsverbalCol, gcsmotorCol]

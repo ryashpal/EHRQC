@@ -42,43 +42,43 @@ def plot(
 
     if 'glucose' in column_mapping:
         glucoseCol = column_mapping['glucose']
-    elif 'hemoglobin' in column_mapping:
+    if 'hemoglobin' in column_mapping:
         hemoglobinCol = column_mapping['hemoglobin']
-    elif 'anion_gap' in column_mapping:
+    if 'anion_gap' in column_mapping:
         anion_gapCol = column_mapping['anion_gap']
-    elif 'bicarbonate' in column_mapping:
+    if 'bicarbonate' in column_mapping:
         bicarbonateCol = column_mapping['bicarbonate']
-    elif 'calcium_total' in column_mapping:
+    if 'calcium_total' in column_mapping:
         calcium_totalCol = column_mapping['calcium_total']
-    elif 'chloride' in column_mapping:
+    if 'chloride' in column_mapping:
         chlorideCol = column_mapping['chloride']
-    elif 'creatinine' in column_mapping:
+    if 'creatinine' in column_mapping:
         creatinineCol = column_mapping['creatinine']
-    elif 'magnesium' in column_mapping:
+    if 'magnesium' in column_mapping:
         magnesiumCol = column_mapping['magnesium']
-    elif 'phosphate' in column_mapping:
+    if 'phosphate' in column_mapping:
         phosphateCol = column_mapping['phosphate']
-    elif 'potassium' in column_mapping:
+    if 'potassium' in column_mapping:
         potassiumCol = column_mapping['potassium']
-    elif 'sodium' in column_mapping:
+    if 'sodium' in column_mapping:
         sodiumCol = column_mapping['sodium']
-    elif 'urea_nitrogen' in column_mapping:
+    if 'urea_nitrogen' in column_mapping:
         urea_nitrogenCol = column_mapping['urea_nitrogen']
-    elif 'hematocrit' in column_mapping:
+    if 'hematocrit' in column_mapping:
         hematocritCol = column_mapping['hematocrit']
-    elif 'mch' in column_mapping:
+    if 'mch' in column_mapping:
         mchCol = column_mapping['mch']
-    elif 'mchc' in column_mapping:
+    if 'mchc' in column_mapping:
         mchcCol = column_mapping['mchc']
-    elif 'mcv' in column_mapping:
+    if 'mcv' in column_mapping:
         mcvCol = column_mapping['mcv']
-    elif 'platelet_count' in column_mapping:
+    if 'platelet_count' in column_mapping:
         platelet_countCol = column_mapping['platelet_count']
-    elif 'rdw' in column_mapping:
+    if 'rdw' in column_mapping:
         rdwCol = column_mapping['rdw']
-    elif 'red_blood_cells' in column_mapping:
+    if 'red_blood_cells' in column_mapping:
         red_blood_cellsCol = column_mapping['red_blood_cells']
-    elif 'white_blood_cells' in column_mapping:
+    if 'white_blood_cells' in column_mapping:
         white_blood_cellsCol = column_mapping['white_blood_cells']
 
     colNames = [glucoseCol, hemoglobinCol, anion_gapCol, bicarbonateCol, calcium_totalCol, chlorideCol, creatinineCol, magnesiumCol, phosphateCol, potassiumCol, sodiumCol, urea_nitrogenCol, hematocritCol, mchCol, mchcCol, mcvCol, platelet_countCol, rdwCol, red_blood_cellsCol, white_blood_cellsCol]

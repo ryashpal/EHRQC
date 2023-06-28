@@ -23,13 +23,13 @@ def plot(
 
     if 'age' in column_mapping:
         ageCol = column_mapping['age']
-    elif 'weight' in column_mapping:
+    if 'weight' in column_mapping:
         weightCol = column_mapping['weight']
-    elif 'height' in column_mapping:
+    if 'height' in column_mapping:
         heightCol = column_mapping['height']
-    elif 'gender' in column_mapping:
+    if 'gender' in column_mapping:
         genderCol = column_mapping['gender']
-    elif 'ethnicity' in column_mapping:
+    if 'ethnicity' in column_mapping:
         ethnicityCol = column_mapping['ethnicity']
 
     start = time.time()
