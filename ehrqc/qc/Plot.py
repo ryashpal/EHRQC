@@ -10,6 +10,10 @@ from ehrqc.qc.labMeasurementsOutliers import plot as plotLabMeasurementsOutliers
 def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.html', column_mapping = {}):
 
     dataDf = pd.read_csv(sourcePath)
+
+    if dataDf.shape[1] > 25:
+        log.info('Too manu variables!! Please select only the ones to be plotted.')
+
     if (dataDf is not None):
         log.info('generating graphs')
         if (plotType == 'demographics_explore'):
