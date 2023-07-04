@@ -1,2 +1,2 @@
-docker-compose up -d --force-recreate
+docker-compose up -d
 docker exec -it ehrqc-app-1 bash
