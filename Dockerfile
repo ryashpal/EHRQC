@@ -4,6 +4,7 @@ FROM python:3.9-slim
 RUN useradd --create-home --shell /bin/bash app_user
 WORKDIR /home/app_user
 RUN apt-get update && apt-get install
+# RUN apt-get install -y r-base
 COPY requirements.txt ./
 # RUN apt-get install libpq-dev
 RUN pip install --no-cache-dir -r requirements.txt
