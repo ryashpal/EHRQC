@@ -1,2 +1,2 @@
 docker-compose up -d
-docker exec -it ehrqc-app-1 bash
+docker exec -it ehrqc_app_1 bash

@@ -80,7 +80,7 @@ def extract(con, savePath='temp', source='mimic', schemaName = 'mimiciv', type='
 
     if data is not None:
         log.info('Saving raw data to file')
-        data.to_csv(savePath)
+        data.to_csv(savePath, index=False)
     else:
         log.error('Unable to extract data, please check the parametrs and try again!')
 

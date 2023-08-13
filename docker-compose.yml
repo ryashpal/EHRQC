@@ -1,6 +1,6 @@
 # Refer: https://medium.com/swlh/dockerize-your-python-command-line-program-6a273f5c5544
 
-version: "3.8"
+version: "3.7"
 services:
   app:
     build: .
