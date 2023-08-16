@@ -375,13 +375,13 @@ def importLabItems(con, sourceSchemaName, filePath, fileSeparator):
     dfColumns = []
     if(Config.labitems_lookup['column_mapping']['itemid']):
         dfColumns.append(Config.labitems_lookup['column_mapping']['itemid'])
-    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+    if(Config.labitems_lookup['column_mapping']['label']):
         dfColumns.append(Config.labitems_lookup['column_mapping']['label'])
-    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+    if(Config.labitems_lookup['column_mapping']['fluid']):
         dfColumns.append(Config.labitems_lookup['column_mapping']['fluid'])
-    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+    if(Config.labitems_lookup['column_mapping']['category']):
         dfColumns.append(Config.labitems_lookup['column_mapping']['category'])
-    if(Config.labitems_lookup['column_mapping']['labevent_id']):
+    if(Config.labitems_lookup['column_mapping']['loinc_code']):
         dfColumns.append(Config.labitems_lookup['column_mapping']['loinc_code'])
     __saveDataframe(con=con, destinationSchemaName=sourceSchemaName, destinationTableName='D_LABITEMS', df=df, dfColumns=dfColumns)
 
