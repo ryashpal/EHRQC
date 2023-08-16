@@ -76,6 +76,20 @@ def detect(
                     drawMissingAnalysis(df, df.columns, tag, text)
                 doc.asis('<div style="clear:both;"></div>')
             if outliers:
+                # for (x, y) in itertools.combinations(df.columns, 2):
+                #     if x in df.columns and y in df.columns:
+                #         with tag('div'):
+                #             with tag('h1'):
+                #                 doc.asis('<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>')
+                #                 with tag('span', klass='fs-4', style="margin: 10px;"):
+                #                     text('Outliers plot - ' + x + ' - ' + y)
+                #             log.info('Outlier plot for: ' + str(x) + str(y))
+                #             fig = __drawOutliers(df, x, y)
+                #             if fig:
+                #                 with tag('div', style="float: left;"):
+                #                     doc.asis('<img src=\'data:image/png;base64,{}\'>'.format(fig))
+                #     doc.asis('<div style="clear:both;"></div>')
+                # doc.asis('<div style="clear:both;"></div>')
                 with tag('div'):
                     with tag('h1'):
                         doc.asis('<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>')
@@ -348,7 +362,7 @@ def __drawKdePlot(df, col):
         data = df,
         x = col,
         ax = ax,
-        color='EE6677'
+        color='r'
     )
 
     if col in ErrorConfig.boundaries:
@@ -356,10 +370,10 @@ def __drawKdePlot(df, col):
         for key in errorDict.keys():
             (lower, upper) = errorDict[key][0]
             if lower:
-                plt.axvline(lower, linestyle=':', color='EE6677')
+                plt.axvline(lower, linestyle=':', color='r')
                 plt.text(lower+(lower*0.01), 0, errorDict[key][1], rotation=90)
             if upper:
-                plt.axvline(upper, linestyle=':', color='EE6677')
+                plt.axvline(upper, linestyle=':', color='r')
                 plt.text(upper-(upper*0.01), 0, errorDict[key][1], rotation=90)
 
     ax.set_title('KDE Plot - ' + col)
