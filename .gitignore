@@ -17,3 +17,4 @@ temp/*
 ehrqc/standardise/migrate_omop/data/*
 notebooks/python/concept_mapping/data/*
 *.bkp*
+data/*

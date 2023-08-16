@@ -12,23 +12,23 @@ with t1 as (
 	concat(year_of_birth::varchar, '-01-01')::date AT TIME ZONE 'Australia/Melbourne' as dob,
 	dth.death_date as dod
 	from
-	omop_cdm.person per
-	inner join mimiciv.patients pat
+	__schema_name__.person per
+	left join mimiciv.patients pat
 	on pat.subject_id = per.person_source_value::int
-	inner join omop_cdm.visit_occurrence vo
+	left join __schema_name__.visit_occurrence vo
 	on vo.person_id = per.person_id
-	inner join omop_cdm.measurement mmt_wt
+	left join __schema_name__.measurement mmt_wt
 	on mmt_wt.person_id = per.person_id and mmt_wt.measurement_concept_id = 3025315 -- Body weight
-	inner join omop_cdm.measurement mmt_ht
+	left join __schema_name__.measurement mmt_ht
 	on mmt_ht.person_id = per.person_id and mmt_ht.measurement_concept_id = 3036277 -- Body height
-	left join omop_cdm.death dth
+	left join __schema_name__.death dth
 	on dth.person_id = per.person_id
 )
 select
 distinct(person_id) as person_id,
-first_value(age) over (partition by person_id order by visit_start_datetime desc),
-first_value(weight) over (partition by person_id order by wt_measurement_datetime desc),
-first_value(height) over (partition by person_id order by ht_measurement_datetime desc),
+first_value(age) over (partition by person_id order by visit_start_datetime desc) as age,
+first_value(weight) over (partition by person_id order by wt_measurement_datetime desc) as weight,
+first_value(height) over (partition by person_id order by ht_measurement_datetime desc) as height,
 gender,
 ethnicity,
 dob,
