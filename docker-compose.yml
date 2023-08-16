@@ -7,6 +7,6 @@ services:
     image: ehr-qc
     network_mode: "host"
     volumes:
-      - /superbugai-data/yash/temp:/home/app_user/data
+      - ./data:/home/app_user/data
     stdin_open: true
     tty: true
