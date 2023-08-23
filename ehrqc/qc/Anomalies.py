@@ -32,6 +32,7 @@ from ehrqc.qc.Outliers import irt_ensemble
 from ehrqc.qc.Impute import compare, impute
 
 from ehrqc import ErrorConfig
+from ehrqc import Settings
 
 
 doc, tag, text = Doc().tagtext()
@@ -206,6 +207,12 @@ def correct(
             if not imputedDf.empty:
                 outliersDf = irt_ensemble(imputedDf)
                 outliersDf = outliersDf[(np.abs(stats.zscore(outliersDf.ensemble_scores)) < 1)]
+                outliersDf.drop('y_knn_agg', axis=1, inplace=True)
+                outliersDf.drop('y_lof', axis=1, inplace=True)
+                outliersDf.drop('y_inflo', axis=1, inplace=True)
+                outliersDf.drop('y_kdeos', axis=1, inplace=True)
+                outliersDf.drop('y_ldf', axis=1, inplace=True)
+                outliersDf.drop('ensemble_scores', axis=1, inplace=True)
 
     outliersDf.to_csv(outputFile, index=False)
 
@@ -424,8 +431,16 @@ if __name__ == "__main__":
     log.info('args.correct_missing: ' + str(args.correct_missing))
     log.info('args.correct_outliers: ' + str(args.correct_outliers))
 
+    dataDf = pd.read_csv(args.source_path[0])
+    if dataDf.shape[1] > int(Settings.col_limit):
+        log.info('Too many variables!! Please select only the ones to be plotted.')
+    elif (dataDf.shape[0] * dataDf.shape[1]) > int(Settings.cell_limit):
+        log.info('This file has ' + str(dataDf.shape[0] * dataDf.shape[1]) + ' cells.')
+        log.info('The maximum number of cell that can be passed to this pipeline is ' + str(Settings.cell_limit))
+        log.info('File too big to handle!! Please remove the columns with low coverage and try again.')
+        log.info('Refer to this link: https://ehr-qc-tutorials.readthedocs.io/en/latest/process.html#large-file-handling')
+
     if args.detect_missing or args.detect_outliers or args.detect_errors or args.detect_inconsistencies:
-        dataDf = pd.read_csv(args.source_path[0])
         detect(
             df=dataDf,
             missing=args.detect_missing,
@@ -436,7 +451,6 @@ if __name__ == "__main__":
             )
 
     if args.correct_missing or args.correct_outliers:
-        dataDf = pd.read_csv(args.source_path[0])
         correct(
             df=dataDf,
             missing=args.correct_missing,
