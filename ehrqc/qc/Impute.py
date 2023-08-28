@@ -2,6 +2,8 @@ import logging
 
 log = logging.getLogger("Anomalies")
 
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -150,11 +152,13 @@ def run(action='compare', source_path = 'data.csv', save_path = 'imputed.csv', a
 
     if dataDf.shape[1] > int(Settings.col_limit):
         log.info('Too many variables!! Please select only the ones to be plotted.')
+        return
     elif (dataDf.shape[0] * dataDf.shape[1]) > int(Settings.cell_limit):
         log.info('This file has ' + str(dataDf.shape[0] * dataDf.shape[1]) + ' cells.')
         log.info('The maximum number of cell that can be passed to this pipeline is ' + str(Settings.cell_limit))
         log.info('File too big to handle!! Please remove the columns with low coverage and try again.')
         log.info('Refer to this link: https://ehr-qc-tutorials.readthedocs.io/en/latest/process.html#large-file-handling')
+        return
 
     if(action=='compare'):
         meanR2, medianR2, knnR2, mfR2, emR2, miR2 = compare(fullDf=dataDf._get_numeric_data())
