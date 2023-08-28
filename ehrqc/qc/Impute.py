@@ -17,6 +17,8 @@ from ehrqc.Utils import MissForest
 import warnings
 warnings.filterwarnings("ignore")
 
+from ehrqc import Settings
+
 
 def compare(fullDf, p=None):
 
@@ -145,6 +147,15 @@ def impute(dataDf, algorithm):
 
 def run(action='compare', source_path = 'data.csv', save_path = 'imputed.csv', algorithm = 'mean'):
     dataDf = pd.read_csv(source_path)
+
+    if dataDf.shape[1] > int(Settings.col_limit):
+        log.info('Too many variables!! Please select only the ones to be plotted.')
+    elif (dataDf.shape[0] * dataDf.shape[1]) > int(Settings.cell_limit):
+        log.info('This file has ' + str(dataDf.shape[0] * dataDf.shape[1]) + ' cells.')
+        log.info('The maximum number of cell that can be passed to this pipeline is ' + str(Settings.cell_limit))
+        log.info('File too big to handle!! Please remove the columns with low coverage and try again.')
+        log.info('Refer to this link: https://ehr-qc-tutorials.readthedocs.io/en/latest/process.html#large-file-handling')
+
     if(action=='compare'):
         meanR2, medianR2, knnR2, mfR2, emR2, miR2 = compare(fullDf=dataDf._get_numeric_data())
         log.info('mean R2: ' + str(meanR2) + ', median R2: ' + str(medianR2) + ', knn R2: ' + str(knnR2) + ', mf R2: ' + str(mfR2) + ', em R2: ' + str(emR2) + ', mi R2: ' + str(miR2))
