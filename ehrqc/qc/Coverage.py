@@ -43,7 +43,7 @@ def run(source_file, chunksize, id_columns, drop, percentage, save_path):
     log.info('\n\n' + str(missing_df) + '\n')
 
     if drop:
-        log.info('''Dropping columns with below ''' + str(percentage) + ''' % coverage''')
+        log.info('''Dropping columns with above ''' + str(percentage) + ''' % missingness''')
         source_dropped_df_list = []
         for source_df in source_df_list:
             source_df.drop(missing_df[missing_df.percentage_missing > percentage].column_name, axis=1, inplace=True)
