@@ -24,6 +24,7 @@ def calculateMissingness(source_file, chunksize, id_columns):
     for df in pd.read_csv(source_file,  chunksize=chunksize):
         source_df_list.append(df)
         df.replace('', np.nan, inplace=True)
+        df = df.dropna(subset=df.columns[~df.columns.isin(id_columns)], how='any')
         missing_counts = (df.groupby(id_columns).agg('count') == 0).sum()
         missing_df = pd.DataFrame({'column_name': missing_counts.index, 'missing_count': missing_counts, 'total_count': len(missing_counts.index)*[df[id_columns].drop_duplicates().shape[0]]})
         missing_df_list.append(missing_df)

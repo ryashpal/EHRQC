@@ -439,6 +439,8 @@ if __name__ == "__main__":
         log.info('The maximum number of cell that can be passed to this pipeline is ' + str(Settings.cell_limit))
         log.info('File too big to handle!! Please remove the columns with low coverage and try again.')
         log.info('Refer to this link: https://ehr-qc-tutorials.readthedocs.io/en/latest/process.html#large-file-handling')
+    
+        sys.exit(0)
 
     if args.detect_missing or args.detect_outliers or args.detect_errors or args.detect_inconsistencies:
         detect(
