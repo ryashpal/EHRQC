@@ -127,12 +127,6 @@ def irt_ensemble(data):
 
 
 if __name__ == '__main__':
-    # import pandas as pd
-    # data = pd.read_csv('/home/yram0006/phd/chapter_1/workspace/EHRQC/data/case_study/vitals_corrected.csv')
-    # # data.dropna(inplace=True)
-    # # df = pd.DataFrame(data, columns=['heartrate', 'sysbp', 'diabp', 'meanbp']) -- heartrate,sysbp,diabp,meanbp,resprate,tempc,spo2,gcseye,gcsverbal,gcsmotor
-    # out = irt_ensemble(data[['heartrate', 'sysbp', 'diabp', 'meanbp', 'resprate', 'tempc', 'spo2', 'gcseye', 'gcsverbal', 'gcsmotor']])
-    # out.to_csv('/tmp/vitals_irt.csv')
 
     import logging
     import sys
@@ -157,7 +151,7 @@ if __name__ == '__main__':
                         help='Path of the directory to store the output')
 
     parser.add_argument('-c', '--combinations', nargs='*', action='append',
-                        help='Combinations to plot')
+                        help='Column combinations to plot (can have multiple column pairs).')
 
     args = parser.parse_args()
 

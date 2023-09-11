@@ -65,7 +65,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='EHRQC')
 
     parser.add_argument('plot_type', nargs=1, default='demographics',
-                        help='Type of plot to generate [demographics_explore, vitals_explore, lab_measurements_explore, vitals_outliers, lab_measurements_outliers]')
+                        help='Type of plot to generate [demographics_explore, vitals_explore, lab_measurements_explore]')
 
     parser.add_argument('source_path', nargs=1, default='data.csv',
                         help='Source data path')

@@ -114,6 +114,27 @@ def drawSummaryTable(df, tag, text, col):
                 text(str(round(df[col].kurtosis(), 2)))
 
 
+def saveDataframe(con, destinationSchemaName, destinationTableName, df, dfColumns):
+
+    import numpy as np
+    import psycopg2.extras
+    import psycopg2.extensions
+
+    psycopg2.extensions.register_adapter(np.int64, psycopg2._psycopg.AsIs)
+
+    if len(df) > 0:
+        table = destinationSchemaName + '.' + destinationTableName
+        columns = '"' + '", "'.join(dfColumns) + '"'
+        values = "VALUES({})".format(",".join(["%s" for _ in dfColumns]))
+        insert_stmt = "INSERT INTO {} ({}) {}".format(table, columns, values)
+        try:
+            cur = con.cursor()
+            psycopg2.extras.execute_batch(cur, insert_stmt, df[dfColumns].values)
+            con.commit()
+        finally:
+            cur.close()
+
+
 """MissForest Imputer for Missing Data"""
 # Author: Ashim Bhattarai
 # License: GNU General Public License v3 (GPLv3)
