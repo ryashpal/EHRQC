@@ -12,7 +12,7 @@ from ehrqc import Settings
 def run(plotType = 'demographics', sourcePath = 'data.csv', savePath = 'plot.html', column_mapping = {}):
 
     dataDf = pd.read_csv(sourcePath)
-
+    
     if dataDf.shape[1] > int(Settings.col_limit):
         log.info('Too many variables!! Please select only the ones to be plotted.')
         return

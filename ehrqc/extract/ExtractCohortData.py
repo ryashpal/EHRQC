@@ -16,6 +16,16 @@ def extractDemographics(con, schemaName):
     return demographicsDf
 
 
+def extractDeaths(con, schemaName):
+    curDir = os.path.dirname(__file__)
+    deathsPath = os.path.join(curDir, 'sql/cohort/mimic_omop_deaths.sql')
+    deathsFile = open(deathsPath)
+    deathsQuery = deathsFile.read()
+    deathsQuery = deathsQuery.replace('__schema_name__', schemaName)
+    deathsDf = pd.read_sql_query(deathsQuery, con)
+    return deathsDf
+
+
 def extractVitals(con, schemaName, aggFunction='min', before=24, after=24):
     curDir = os.path.dirname(__file__)
     vitalsQuery = None
@@ -91,7 +101,9 @@ def extract(con, savePath='data/data.csv', cohortPath = 'data/cohort.csv', schem
     data = None
     if(type == 'demographics'):
         data = extractDemographics(con, schemaName = schemaName)
-    if(type == 'vitals'):
+    if(type == 'deaths'):
+        data = extractDeaths(con, schemaName = schemaName)
+    elif(type == 'vitals'):
         data = extractVitals(con, schemaName = schemaName, aggFunction=aggFunction, before=before, after=after)
     elif(type == 'lab_measurements'):
         data = extractLabMeasurements(con, schemaName = schemaName, aggFunction=aggFunction, before=before, after=after)
@@ -130,7 +142,7 @@ if __name__ == '__main__':
                         help='Source schema name')
 
     parser.add_argument('data_type', nargs=1, default='demographics',
-                        help='Data type name [demographics, vitals, lab_measurements]')
+                        help='Data type name [demographics, deaths, vitals, lab_measurements]')
 
     parser.add_argument('agg_function', nargs=1, default='min',
                         help='Aggregation Function to use [min, max, avg, stddev, first, last]')

@@ -1,4 +1,5 @@
 .venv/*
+.venv_bkp/*
 notebooks/.venv/*
 notebooks/python/.venv/*
 notebooks/python/concept_mapping/.venv/*

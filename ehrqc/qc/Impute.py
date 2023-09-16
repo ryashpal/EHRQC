@@ -27,12 +27,14 @@ def compare(fullDf, p=None):
     if not p:
         if fullDf.isna().sum().mean() > 0:
             p = fullDf.isna().sum().mean()/fullDf.shape[0]
-        else:
-            p = 0.1
+    else:
+        p = float(p[0])
 
     log.info('Creating missingness with proportion p = (' + str(p) + ')')
 
+    log.info('Data size before dropping nulls: ' + str(fullDf.shape))
     fullDf.dropna(inplace=True)
+    log.info('Data size after dropping nulls: ' + str(fullDf.shape))
 
     mask = np.random.choice(a=[True, False], size=fullDf.shape, p=[p, 1-p])
     missingDf = fullDf.mask(mask)
@@ -114,6 +116,7 @@ def compare(fullDf, p=None):
 
 def impute(dataDf, algorithm):
 
+    imputedDf = None
     if algorithm == 'mean':
         meanImputer = SimpleImputer(strategy='mean')
         meanImputedData = meanImputer.fit_transform(dataDf)
@@ -147,7 +150,7 @@ def impute(dataDf, algorithm):
     return imputedDf
 
 
-def run(action='compare', source_path = 'data.csv', save_path = 'imputed.csv', algorithm = 'mean'):
+def run(action='compare', source_path = 'data.csv', p=None, save_path = 'imputed.csv', algorithm = 'mean'):
     dataDf = pd.read_csv(source_path)
 
     if dataDf.shape[1] > int(Settings.col_limit):
@@ -161,7 +164,7 @@ def run(action='compare', source_path = 'data.csv', save_path = 'imputed.csv', a
         return
 
     if(action=='compare'):
-        meanR2, medianR2, knnR2, mfR2, emR2, miR2 = compare(fullDf=dataDf._get_numeric_data())
+        meanR2, medianR2, knnR2, mfR2, emR2, miR2 = compare(fullDf=dataDf._get_numeric_data(), p=p)
         log.info('mean R2: ' + str(meanR2) + ', median R2: ' + str(medianR2) + ', knn R2: ' + str(knnR2) + ', mf R2: ' + str(mfR2) + ', em R2: ' + str(emR2) + ', mi R2: ' + str(miR2))
     elif(action=='impute'):
         imputedDf = impute(dataDf=dataDf._get_numeric_data(), algorithm=algorithm)
@@ -192,6 +195,9 @@ if __name__ == '__main__':
     parser.add_argument('source_path', nargs=1, default='data.csv',
                         help='Source data path')
 
+    parser.add_argument('-p', '--percentage', nargs=1,
+                        help='Missing value proportion for comparison (required only for action=compare)')
+
     parser.add_argument('-sp', '--save_path', nargs=1, default='imputed.csv',
                         help='Path of the file to store the outputs (required only for action=impute)')
 
@@ -202,9 +208,10 @@ if __name__ == '__main__':
 
     log.info('args.action: ' + str(args.action[0]))
     log.info('args.source_path: ' + str(args.source_path[0]))
+    log.info('args.percentage: ' + str(args.percentage))
     log.info('args.save_path: ' + str(args.save_path[0]))
     log.info('args.algorithm: ' + str(args.algorithm[0]))
 
-    run(action=args.action[0], source_path = args.source_path[0], save_path = args.save_path[0], algorithm = args.algorithm[0])
+    run(action=args.action[0], source_path = args.source_path[0], p = args.percentage, save_path = args.save_path[0], algorithm = args.algorithm[0])
 
     log.info('Done!!')
