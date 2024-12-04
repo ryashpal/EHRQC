@@ -43,7 +43,21 @@ For the most up-to-date documentation about installation, configuration, running
 
 ## Cite Us
 
-```json
+If you use this library for your research, please cite our paper:
+
+Yashpal Ramakrishnaiah, Nenad Macesic, Geoffrey I. Webb, Anton Y. Peleg, Sonika Tyagi,
+
+EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes, Journal of Biomedical Informatics,
+
+Volume 147, 2023, 104509, ISSN 1532-0464,
+
+https://doi.org/10.1016/j.jbi.2023.104509.
+
+(https://www.sciencedirect.com/science/article/pii/S1532046423002307)
+
+BibTeX:
+
+```
 @article{RAMAKRISHNAIAH2023104509,
 title = {EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes},
 journal = {Journal of Biomedical Informatics},
