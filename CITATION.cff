@@ -1,13 +1,26 @@
-@article{RAMAKRISHNAIAH2023104509,
-title = {EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes},
-journal = {Journal of Biomedical Informatics},
-volume = {147},
-pages = {104509},
-year = {2023},
-issn = {1532-0464},
-doi = {https://doi.org/10.1016/j.jbi.2023.104509},
-url = {https://www.sciencedirect.com/science/article/pii/S1532046423002307},
-author = {Yashpal Ramakrishnaiah and Nenad Macesic and Geoffrey I. Webb and Anton Y. Peleg and Sonika Tyagi},
-keywords = {Digital health, Electronic health records, EHR, Clinical outcome prediction, Machine learning},
-abstract = {The adoption of electronic health records (EHRs) has created opportunities to analyse historical data for predicting clinical outcomes and improving patient care. However, non-standardised data representations and anomalies pose major challenges to the use of EHRs in digital health research. To address these challenges, we have developed EHR-QC, a tool comprising two modules: the data standardisation module and the preprocessing module. The data standardisation module migrates source EHR data to a standard format using advanced concept mapping techniques, surpassing expert curation in benchmarking analysis. The preprocessing module includes several functions designed specifically to handle healthcare data subtleties. We provide automated detection of data anomalies and solutions to handle those anomalies. We believe that the development and adoption of tools like EHR-QC is critical for advancing digital health. Our ultimate goal is to accelerate clinical research by enabling rapid experimentation with data-driven observational research to generate robust, generalisable biomedical knowledge.}
-}
+cff-version: 1.2.0
+message: If you use this software, please cite both the article from preferred-citation and the software itself.
+authors:
+  - family-names: Yashpal Ramakrishnaiah
+    given-names: Nenad Macesic
+  - family-names: Geoffrey I. Webb
+    given-names: Anton Y. Peleg
+title: 'EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes'
+version: 1.0.0
+url: https://www.sciencedirect.com/science/article/pii/S1532046423002307
+doi: https://doi.org/10.1016/j.jbi.2023.104509
+date-released: '2023-12-04'
+preferred-citation:
+  authors:
+    - family-names: Yashpal Ramakrishnaiah
+      given-names: Nenad Macesic
+    - family-names: Geoffrey I. Webb
+      given-names: Anton Y. Peleg
+  title: 'EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes'
+  doi: https://doi.org/10.1016/j.jbi.2023.104509
+  url: https://www.sciencedirect.com/science/article/pii/S1532046423002307
+  type: article-journal
+  pages: '104509'
+  year: '2023'
+  conference: {}
+  publisher: {}
