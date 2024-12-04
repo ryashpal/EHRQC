@@ -41,6 +41,23 @@ pip install -r requirements.txt
 For the most up-to-date documentation about installation, configuration, running, and use cases please refer to the EHR-QC [Documantation](https://ehr-qc-tutorials.readthedocs.io/en/latest/index.html) page.
 
 
+## Cite Us
+
+```json
+@article{RAMAKRISHNAIAH2023104509,
+title = {EHR-QC: A streamlined pipeline for automated electronic health records standardisation and preprocessing to predict clinical outcomes},
+journal = {Journal of Biomedical Informatics},
+volume = {147},
+pages = {104509},
+year = {2023},
+issn = {1532-0464},
+doi = {https://doi.org/10.1016/j.jbi.2023.104509},
+url = {https://www.sciencedirect.com/science/article/pii/S1532046423002307},
+author = {Yashpal Ramakrishnaiah and Nenad Macesic and Geoffrey I. Webb and Anton Y. Peleg and Sonika Tyagi},
+keywords = {Digital health, Electronic health records, EHR, Clinical outcome prediction, Machine learning},
+}
+```
+
 ## Acknowledgements
 
 Our special thanks to;
